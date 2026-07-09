@@ -6,7 +6,7 @@ from pypdf import PdfReader, PdfWriter
 
 # --- 0. CONFIGURAÇÃO DA PÁGINA ---
 st.set_page_config(
-    page_title="Audiobook Studio",
+    page_title="AudioLivre Studio",
     page_icon="🎧",
     layout="wide",
     initial_sidebar_state="collapsed"
@@ -410,7 +410,7 @@ with col_title:
     st.markdown(f"""
     <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 1rem;">
         <span style="font-size: 2.25rem;">🎧</span>
-        <span class="header-title">Audiobook Studio</span>
+        <span class="header-title">AudioLivre Studio</span>
     </div>
     """, unsafe_allow_html=True)
 with col_theme:
@@ -466,7 +466,7 @@ if st.session_state.page == "home":
     st.markdown("""
     <div class="hero-container">
         <div class="hero-badge">Estúdio Profissional de Narração</div>
-        <h1 class="hero-title">Seus PDFs em <span class="gradient-text">Audiobooks</span> de Alta Qualidade</h1>
+        <h1 class="hero-title">Seus PDFs em <span class="gradient-text">Audiolivros</span> de Alta Qualidade</h1>
         <p class="hero-subtitle">Utilize vozes neurais ultrarrealistas de inteligência artificial para ler, traduzir e converter seus documentos em MP3 de forma simples, elegante e totalmente gratuita.</p>
     </div>
     """, unsafe_allow_html=True)
@@ -910,11 +910,11 @@ elif st.session_state.page == "studio":
                 )
                 
                 if resultado.getbuffer().nbytes > 0:
-                    status_text.text("Audiobook sintetizado com sucesso!")
+                    status_text.text("Audiolivro sintetizado com sucesso!")
                     progress_bar.progress(1.0, text="Concluído!")
                     
                     with st.container(border=True):
-                        st.markdown("#### Ouvir e Baixar seu Audiobook")
+                        st.markdown("#### Ouvir e Baixar seu Audiolivro")
                         
                         col_audio, col_dl = st.columns([3, 1])
                         with col_audio:
@@ -923,7 +923,7 @@ elif st.session_state.page == "studio":
                             st.download_button(
                                 label="⬇️ Baixar MP3",
                                 data=resultado.getvalue(),
-                                file_name="audiobook.mp3",
+                                file_name="audiolivre.mp3",
                                 mime="audio/mp3",
                                 type="primary",
                                 use_container_width=True
