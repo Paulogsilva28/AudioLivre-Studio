@@ -938,6 +938,6 @@ st.markdown("<br><br><br>", unsafe_allow_html=True)
 footer_color = "#94a3b8" if st.session_state.dark_mode else "#475569"
 st.markdown(f"""
 <div style="text-align: center; font-family: 'Outfit', sans-serif; font-size: 0.9rem; color: {footer_color}; padding-bottom: 2rem; border-top: 1px solid {card_border}; padding-top: 1.5rem;">
-    Desenvolvido com 🎧 por <a href="https://github.com/Paulogsilva28" target="_blank" style="color: #dc2626; font-weight: 700; text-decoration: none; border-bottom: 1px dashed #d97706;">Paulo Silva</a>
+    Desenvolvido por <a href="https://github.com/Paulogsilva28" target="_blank" style="color: #dc2626; font-weight: 700; text-decoration: none; border-bottom: 1px dashed #d97706;">Paulo Silva</a>
 </div>
 """, unsafe_allow_html=True)
