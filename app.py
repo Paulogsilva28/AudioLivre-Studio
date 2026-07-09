@@ -23,6 +23,12 @@ if 'velocidade' not in st.session_state:
     st.session_state.velocidade = 1.0
 if 'dark_mode' not in st.session_state:
     st.session_state.dark_mode = True
+if 'deepseek_api_key' not in st.session_state:
+    st.session_state.deepseek_api_key = ""
+if 'contexto_livro' not in st.session_state:
+    st.session_state.contexto_livro = ""
+if 'instrucoes_traducao' not in st.session_state:
+    st.session_state.instrucoes_traducao = ""
 
 # --- 1. DEFINIÇÃO DA PALETA DE CORES (VERMELHO E AMARELO) E TEMA ---
 if st.session_state.dark_mode:
@@ -230,20 +236,33 @@ st.markdown(f"""
         border-radius: 8px !important;
     }}
 
-    /* Estilo legível e visível para o File Uploader */
-    div[data-testid="stFileUploaderDropzone"] {{
+    /* Estilização legível e altamente visível para o File Uploader */
+    div[data-testid="stFileUploader"] section {{
         background-color: {input_bg} !important;
         border: 1px dashed {input_border} !important;
+        border-radius: 12px !important;
+        padding: 1.5rem !important;
     }}
-    /* Cores de todos os textos internos do uploader */
-    div[data-testid="stFileUploaderDropzone"] * {{
+    /* Forçar todos os textos dentro do uploader a usar a cor de texto visível */
+    div[data-testid="stFileUploader"] section * {{
         color: {text_color} !important;
     }}
     /* Botão específico de upload dentro da dropzone */
-    div[data-testid="stFileUploaderDropzone"] button {{
+    div[data-testid="stFileUploader"] section button {{
         background-color: {card_border} !important;
         color: {text_color} !important;
         border: 1px solid {input_border} !important;
+        width: auto !important;
+    }}
+    div[data-testid="stFileUploader"] section button:hover {{
+        background-color: {input_border} !important;
+        border-color: #d97706 !important;
+    }}
+
+    /* Fallback para classes alternativas do uploader */
+    div[data-testid="stFileUploaderDropzone"] {{
+        background-color: {input_bg} !important;
+        border: 1px dashed {input_border} !important;
     }}
 
     /* Corrigir cores dos inputs normais */
@@ -251,6 +270,12 @@ st.markdown(f"""
         background-color: {input_bg} !important;
         color: {text_color} !important;
         border-color: {input_border} !important;
+    }}
+    input[type="text"], input[type="password"] {{
+        background-color: {input_bg} !important;
+        color: {text_color} !important;
+        border: 1px solid {input_border} !important;
+        border-radius: 8px !important;
     }}
 
     /* Estilo para barra de navegação */
@@ -377,10 +402,15 @@ with col_theme:
         st.session_state.dark_mode = not st.session_state.dark_mode
         st.rerun()
 
-# Abas de Navegação usando Segmented Control de forma customizada e limpa
-col_nav, _ = st.columns([2, 1])
+# Abas de Navegação usando Segmented Control
+col_nav, _ = st.columns([2.5, 1])
 with col_nav:
-    nav_options = {"home": "🏠 Início", "editor": "📖 Editor de Texto", "studio": "🎙️ Estúdio de Áudio"}
+    nav_options = {
+        "home": "🏠 Início", 
+        "editor": "📖 Editor de Texto", 
+        "translator": "🌐 Tradutor DeepSeek",
+        "studio": "🎙️ Estúdio de Áudio"
+    }
     selected_page = st.segmented_control(
         "Navegação",
         options=list(nav_options.keys()),
@@ -484,22 +514,164 @@ elif st.session_state.page == "editor":
                 placeholder="Cole seu texto aqui ou envie um PDF ao lado para começar..."
             )
             
-            if st.button("💾 Salvar Roteiro e ir para Gravação", use_container_width=True):
+            if st.button("💾 Salvar Roteiro", use_container_width=True):
                 st.session_state.texto_final = texto_editado
                 if texto_editado.strip():
-                    st.session_state.page = "studio"
-                    st.rerun()
+                    st.success("Roteiro salvo com sucesso! Escolha o Tradutor DeepSeek ou o Estúdio de Áudio na barra superior.")
                 else:
                     st.warning("O editor está vazio! Adicione algum texto antes de salvar.")
 
 # ==========================================
-# PÁGINA 3: ESTÚDIO DE ÁUDIO (🎙️ Estúdio)
+# PÁGINA 3: TRADUTOR DEEPSEEK (🌐 Tradutor)
+# ==========================================
+elif st.session_state.page == "translator":
+    st.markdown("### 🌐 Tradutor de PDF com IA (DeepSeek)")
+    st.caption("Faça upload de um PDF em Inglês ou traduza o texto do Editor usando a API do DeepSeek com instruções customizadas.")
+
+    col_left, col_right = st.columns([1.2, 2])
+
+    with col_left:
+        with st.container(border=True):
+            st.markdown("#### 1. Configurações da API")
+            api_key = st.text_input(
+                "DeepSeek API Key:",
+                type="password",
+                value=st.session_state.deepseek_api_key,
+                placeholder="Insira sua chave sk-..."
+            )
+            st.session_state.deepseek_api_key = api_key
+
+            st.markdown("---")
+            st.markdown("#### 2. Carregar Novo PDF (Inglês)")
+            uploaded_pdf = st.file_uploader(
+                "Upload de PDF para Traduzir",
+                type=["pdf"],
+                key="translator_pdf_uploader",
+                label_visibility="collapsed"
+            )
+
+            if uploaded_pdf:
+                with st.spinner("Extraindo texto do PDF..."):
+                    texto_extraido = extrair_texto_pdf(uploaded_pdf)
+                st.success(f"PDF carregado: {len(texto_extraido):,} caracteres extraídos!")
+                st.session_state.texto_final = texto_extraido
+
+        with st.container(border=True):
+            st.markdown("#### 3. Prompts e Instruções")
+            contexto = st.text_area(
+                "Sobre o que é o livro (Contexto):",
+                value=st.session_state.contexto_livro,
+                placeholder="Ex: Livro de fantasia medieval sombria com foco em alquimia e combates.",
+                height=100
+            )
+            st.session_state.contexto_livro = contexto
+
+            instrucoes = st.text_area(
+                "Instruções especiais de tradução:",
+                value=st.session_state.instrucoes_traducao,
+                placeholder="Ex: Traduza 'Mana' como 'Energia Espiritual'. Mantenha o tratamento formal 'vós' para a realeza.",
+                height=120
+            )
+            st.session_state.instrucoes_traducao = instrucoes
+
+    with col_right:
+        with st.container(border=True):
+            st.markdown("#### 4. Visualização do Texto para Traduzir")
+            texto_original = st.text_area(
+                "Texto para Traduzir:",
+                value=st.session_state.texto_final,
+                height=345,
+                key="translator_textarea",
+                label_visibility="collapsed",
+                placeholder="O texto extraído do PDF ou digitado aparecerá aqui..."
+            )
+            st.session_state.texto_final = texto_original
+
+        # Botão de Ação de Tradução
+        if st.button("🌐 Iniciar Tradução com DeepSeek", use_container_width=True):
+            if not api_key.strip():
+                st.error("Por favor, insira uma DeepSeek API Key válida nas configurações.")
+            elif not st.session_state.texto_final.strip():
+                st.warning("Não há texto disponível para tradução. Envie um PDF ou digite algo.")
+            else:
+                chunks = split_text(st.session_state.texto_final, max_chars=2500)
+                total_chunks = len(chunks)
+                
+                st.info(f"Iniciando tradução de {total_chunks} partes...")
+                progress_bar = st.progress(0, text="Conectando com DeepSeek...")
+                status_text = st.empty()
+                
+                texto_traduzido_acumulado = []
+                sucesso = True
+                
+                for i, chunk in enumerate(chunks):
+                    status_text.text(f"Traduzindo parte {i+1} de {total_chunks}...")
+                    progress_bar.progress(i / total_chunks)
+                    
+                    try:
+                        import requests
+                        headers = {
+                            "Content-Type": "application/json",
+                            "Authorization": f"Bearer {api_key}"
+                        }
+                        
+                        system_prompt = f"""Você é um tradutor profissional de livros do Inglês para o Português Brasileiro (pt-BR).
+O livro tem o seguinte contexto geral:
+{contexto}
+
+Instruções especiais de tradução a seguir estritamente:
+{instrucoes}
+
+Mantenha a fidelidade, fluidez de leitura, parágrafos e o tom literário original. Não invente explicações, não inclua notas e retorne APENAS o texto traduzido final."""
+
+                        payload = {
+                            "model": "deepseek-chat",
+                            "messages": [
+                                {"role": "system", "content": system_prompt},
+                                {"role": "user", "content": chunk}
+                            ],
+                            "temperature": 0.3
+                        }
+                        
+                        response = requests.post(
+                            "https://api.deepseek.com/chat/completions",
+                            headers=headers,
+                            json=payload,
+                            timeout=60
+                        )
+                        
+                        if response.status_code == 200:
+                            res_json = response.json()
+                            translated_chunk = res_json["choices"][0]["message"]["content"].strip()
+                            texto_traduzido_acumulado.append(translated_chunk)
+                        else:
+                            st.error(f"Erro na parte {i+1}: Status {response.status_code} - {response.text}")
+                            sucesso = False
+                            break
+                    except Exception as e:
+                        st.error(f"Erro ao conectar com DeepSeek na parte {i+1}: {e}")
+                        sucesso = False
+                        break
+                
+                if sucesso:
+                    progress_bar.progress(1.0, text="Concluído!")
+                    status_text.text("Tradução finalizada com sucesso!")
+                    texto_final_traduzido = "\n\n".join(texto_traduzido_acumulado)
+                    st.session_state.texto_final = texto_final_traduzido
+                    
+                    st.success("Tudo pronto! O texto traduzido foi salvo. Vá para a aba Estúdio de Áudio para gravar a narração em português.")
+                    
+                    with st.expander("Visualizar Texto Traduzido"):
+                        st.text_area("Resultado:", value=texto_final_traduzido, height=250, disabled=True)
+
+# ==========================================
+# PÁGINA 4: ESTÚDIO DE ÁUDIO (🎙️ Estúdio)
 # ==========================================
 elif st.session_state.page == "studio":
     st.markdown("### 🎙️ Estúdio de Gravação e Síntese de Voz")
     
     if not st.session_state.texto_final.strip():
-        st.info("⚠️ O roteiro está vazio. Envie um PDF ou escreva algo na aba Editor de Texto antes de prosseguir.")
+        st.info("⚠️ O roteiro está vazio. Envie um PDF, use o tradutor ou escreva algo na aba Editor de Texto antes de prosseguir.")
         if st.button("Ir para o Editor de Texto"):
             st.session_state.page = "editor"
             st.rerun()
