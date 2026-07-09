@@ -402,24 +402,34 @@ with col_theme:
         st.session_state.dark_mode = not st.session_state.dark_mode
         st.rerun()
 
-# Abas de Navegação usando Segmented Control
-col_nav, _ = st.columns([2.5, 1])
+# Barra de Navegação Separada
+col_nav, col_trans, _ = st.columns([1.8, 1.2, 1.0])
 with col_nav:
     nav_options = {
         "home": "🏠 Início", 
         "editor": "📖 Editor de Texto", 
-        "translator": "🌐 Tradutor DeepSeek",
         "studio": "🎙️ Estúdio de Áudio"
     }
+    
+    # Se o usuário estiver na aba do Tradutor, a seleção ativa do segmented control fica vazia
+    default_sel = st.session_state.page if st.session_state.page in nav_options else None
+    
     selected_page = st.segmented_control(
         "Navegação",
         options=list(nav_options.keys()),
         format_func=lambda x: nav_options[x],
         label_visibility="collapsed",
-        default=st.session_state.page
+        default=default_sel
     )
     if selected_page and selected_page != st.session_state.page:
         st.session_state.page = selected_page
+        st.rerun()
+
+with col_trans:
+    # Botão do Tradutor DeepSeek afastado e isolado na navegação
+    is_translator = (st.session_state.page == "translator")
+    if st.button("🌐 Tradutor DeepSeek", use_container_width=True, type="primary" if is_translator else "secondary"):
+        st.session_state.page = "translator"
         st.rerun()
 
 st.divider()
@@ -659,7 +669,7 @@ Mantenha a fidelidade, fluidez de leitura, parágrafos e o tom literário origin
                     texto_final_traduzido = "\n\n".join(texto_traduzido_acumulado)
                     st.session_state.texto_final = texto_final_traduzido
                     
-                    st.success("Tudo pronto! O texto traduzido foi salvo. Vá para a aba Estúdio de Áudio para gravar a narração em português.")
+                    st.success("Tudo pronto! O texto traduzido foi salvo. Vá para o Estúdio de Áudio para gravar a narração em português.")
                     
                     with st.expander("Visualizar Texto Traduzido"):
                         st.text_area("Resultado:", value=texto_final_traduzido, height=250, disabled=True)
