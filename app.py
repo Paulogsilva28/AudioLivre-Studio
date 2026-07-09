@@ -37,8 +37,8 @@ if st.session_state.dark_mode:
     card_border = "rgba(255, 255, 255, 0.06)"
     text_color = "#f8fafc"
     subtitle_color = "#94a3b8"
-    input_bg = "rgba(255, 255, 255, 0.03)"
-    input_border = "rgba(255, 255, 255, 0.08)"
+    input_bg = "#1a1212"  # Fundo escuro para inputs
+    input_border = "rgba(255, 255, 255, 0.1)"
     btn_text = "#ffffff"
     badge_bg = "rgba(255, 255, 255, 0.03)"
     badge_color = "#cbd5e1"
@@ -56,7 +56,7 @@ else:
     card_border = "rgba(0, 0, 0, 0.08)"
     text_color = "#1e1b4b"
     subtitle_color = "#475569"
-    input_bg = "rgba(0, 0, 0, 0.02)"
+    input_bg = "#f5f3ef"  # Fundo claro para inputs
     input_border = "rgba(0, 0, 0, 0.12)"
     btn_text = "#ffffff"
     badge_bg = "rgba(0, 0, 0, 0.03)"
@@ -102,6 +102,19 @@ st.markdown(f"""
     div[data-testid="stWidgetLabel"] p, label, .stMarkdown h4 {{
         color: {text_color} !important;
         font-weight: 600 !important;
+    }}
+
+    /* Classe do Título para evitar bugs no background-clip de navegadores */
+    .header-title {{
+        font-family: 'Outfit', sans-serif;
+        font-size: 1.6rem;
+        font-weight: 800;
+        background: {title_gradient} !important;
+        -webkit-background-clip: text !important;
+        background-clip: text !important;
+        -webkit-text-fill-color: transparent !important;
+        color: transparent !important;
+        display: inline-block;
     }}
 
     /* Estilo do Hero da Landing Page */
@@ -205,15 +218,32 @@ st.markdown(f"""
         color: {btn_text} !important;
     }}
 
-    /* Customização específica do input text area */
-    div[data-baseweb="textarea"] {{
+    /* Estilo robusto e legível para a caixa de texto (textarea) */
+    div[data-testid="stTextArea"] textarea,
+    div[data-testid="stTextArea"] div[data-baseweb="textarea"],
+    div[data-testid="stTextArea"] div[data-baseweb="base-input"] {{
         background-color: {input_bg} !important;
+        color: {text_color} !important;
+    }}
+    div[data-testid="stTextArea"] div[data-baseweb="textarea"] {{
         border: 1px solid {input_border} !important;
         border-radius: 8px !important;
     }}
-    div[data-baseweb="textarea"] textarea {{
-        background-color: transparent !important;
+
+    /* Estilo legível e visível para o File Uploader */
+    div[data-testid="stFileUploaderDropzone"] {{
+        background-color: {input_bg} !important;
+        border: 1px dashed {input_border} !important;
+    }}
+    /* Cores de todos os textos internos do uploader */
+    div[data-testid="stFileUploaderDropzone"] * {{
         color: {text_color} !important;
+    }}
+    /* Botão específico de upload dentro da dropzone */
+    div[data-testid="stFileUploaderDropzone"] button {{
+        background-color: {card_border} !important;
+        color: {text_color} !important;
+        border: 1px solid {input_border} !important;
     }}
 
     /* Corrigir cores dos inputs normais */
@@ -338,7 +368,7 @@ with col_title:
     st.markdown(f"""
     <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 1rem;">
         <span style="font-size: 2.25rem;">🎧</span>
-        <span style="font-family: 'Outfit', sans-serif; font-size: 1.6rem; font-weight: 800; background: {title_gradient}; -webkit-background-clip: text; -webkit-text-fill-color: transparent;">Audiobook Studio</span>
+        <span class="header-title">Audiobook Studio</span>
     </div>
     """, unsafe_allow_html=True)
 with col_theme:
