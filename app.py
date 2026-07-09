@@ -12,175 +12,6 @@ st.set_page_config(
     initial_sidebar_state="collapsed"
 )
 
-# --- 1. CSS CUSTOMIZADO PREMIUM ---
-st.markdown("""
-<style>
-    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;500;600;700;800&display=swap');
-
-    /* Fontes globais */
-    html, body, [class*="css"] {
-        font-family: 'Inter', sans-serif;
-    }
-    h1, h2, h3, h4, h5, h6 {
-        font-family: 'Outfit', sans-serif;
-    }
-
-    /* Fundo da aplicação */
-    .stApp {
-        background: radial-gradient(circle at 80% 20%, rgba(138, 43, 226, 0.15), transparent 50%),
-                    radial-gradient(circle at 20% 80%, rgba(0, 255, 255, 0.1), transparent 50%),
-                    #0b0b14 !important;
-        color: #e2e8f0;
-    }
-
-    .main .block-container {
-        padding-top: 1.5rem;
-        padding-bottom: 3rem;
-        max-width: 1100px;
-    }
-
-    /* Painéis de vidro (Glassmorphism) */
-    .glass-panel {
-        background: rgba(255, 255, 255, 0.02) !important;
-        border: 1px solid rgba(255, 255, 255, 0.05) !important;
-        border-radius: 16px !important;
-        padding: 2rem !important;
-        backdrop-filter: blur(12px) !important;
-        box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3) !important;
-        margin-bottom: 1.5rem !important;
-    }
-
-    /* Estilo do Hero da Landing Page */
-    .hero-container {
-        text-align: center;
-        padding: 3rem 1rem 2rem 1rem;
-    }
-    .hero-badge {
-        display: inline-block;
-        background: linear-gradient(135deg, rgba(138, 43, 226, 0.2), rgba(0, 255, 255, 0.2));
-        border: 1px solid rgba(0, 255, 255, 0.3);
-        color: #00ffff;
-        padding: 0.35rem 1.2rem;
-        border-radius: 20px;
-        font-size: 0.85rem;
-        font-weight: 600;
-        text-transform: uppercase;
-        letter-spacing: 1px;
-        margin-bottom: 1.5rem;
-    }
-    .hero-title {
-        font-size: 3.5rem;
-        font-weight: 800;
-        margin-bottom: 1rem;
-        background: linear-gradient(135deg, #ffffff 40%, #c084fc 70%, #22d3ee 100%);
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
-        letter-spacing: -1px;
-    }
-    .hero-subtitle {
-        font-size: 1.2rem;
-        color: #94a3b8;
-        max-width: 650px;
-        margin: 0 auto 2.5rem auto;
-        line-height: 1.6;
-    }
-
-    /* Cards de Recursos */
-    .feature-card {
-        background: rgba(255, 255, 255, 0.01);
-        border: 1px solid rgba(255, 255, 255, 0.04);
-        border-radius: 16px;
-        padding: 2.2rem 1.8rem;
-        text-align: center;
-        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-        height: 100%;
-    }
-    .feature-card:hover {
-        background: rgba(255, 255, 255, 0.03);
-        border-color: rgba(138, 43, 226, 0.3);
-        transform: translateY(-5px);
-        box-shadow: 0 12px 30px rgba(138, 43, 226, 0.08);
-    }
-    .feature-icon {
-        font-size: 2.8rem;
-        margin-bottom: 1.2rem;
-    }
-    .feature-card h3 {
-        font-size: 1.3rem;
-        font-weight: 700;
-        margin-bottom: 0.6rem;
-        color: #f1f5f9;
-    }
-    .feature-card p {
-        color: #94a3b8;
-        font-size: 0.9rem;
-        line-height: 1.5;
-        margin: 0;
-    }
-
-    /* Custom badges */
-    .info-badge {
-        display: inline-block;
-        background: rgba(255, 255, 255, 0.03);
-        color: #cbd5e1;
-        padding: 0.4rem 1rem;
-        border-radius: 20px;
-        font-size: 0.85rem;
-        margin-right: 0.5rem;
-        margin-bottom: 0.5rem;
-        border: 1px solid rgba(255, 255, 255, 0.06);
-        font-weight: 500;
-    }
-
-    /* Botão Customizado */
-    div.stButton > button {
-        background: linear-gradient(135deg, #8a2be2, #00ffff) !important;
-        color: #ffffff !important;
-        border: none !important;
-        font-weight: 600 !important;
-        font-size: 1rem !important;
-        border-radius: 8px !important;
-        padding: 0.6rem 2rem !important;
-        box-shadow: 0 4px 15px rgba(138, 43, 226, 0.25) !important;
-        transition: all 0.25s ease !important;
-        width: 100%;
-    }
-    div.stButton > button:hover {
-        transform: translateY(-2px) !important;
-        box-shadow: 0 6px 20px rgba(0, 255, 255, 0.35) !important;
-        color: #ffffff !important;
-    }
-
-    /* Botões Secundários */
-    div.stButton > button[kind="secondary"] {
-        background: rgba(255, 255, 255, 0.03) !important;
-        border: 1px solid rgba(255, 255, 255, 0.08) !important;
-        color: #e2e8f0 !important;
-        box-shadow: none !important;
-    }
-    div.stButton > button[kind="secondary"]:hover {
-        background: rgba(255, 255, 255, 0.08) !important;
-        border-color: rgba(255, 255, 255, 0.2) !important;
-    }
-
-    /* Customizações de inputs Streamlit */
-    textarea {
-        background-color: rgba(255, 255, 255, 0.02) !important;
-        border: 1px solid rgba(255, 255, 255, 0.05) !important;
-        color: #e2e8f0 !important;
-        border-radius: 8px !important;
-    }
-    textarea:focus {
-        border-color: #00ffff !important;
-    }
-
-    /* Ocultar elements padrão do Streamlit */
-    #MainMenu {visibility: hidden;}
-    footer {visibility: hidden;}
-    header {visibility: hidden;}
-</style>
-""", unsafe_allow_html=True)
-
 # --- 2. ESTADO GLOBAL ---
 if 'page' not in st.session_state:
     st.session_state.page = "home"
@@ -190,6 +21,227 @@ if 'voz' not in st.session_state:
     st.session_state.voz = "pt-BR-AntonioNeural"
 if 'velocidade' not in st.session_state:
     st.session_state.velocidade = 1.0
+if 'dark_mode' not in st.session_state:
+    st.session_state.dark_mode = True
+
+# --- 1. DEFINIÇÃO DA PALETA DE CORES (VERMELHO E AMARELO) E TEMA ---
+if st.session_state.dark_mode:
+    # Modo Escuro (Burgundy/Charcoal com Destaques Crimson e Amber)
+    bg_gradient = """
+        background: radial-gradient(circle at 80% 20%, rgba(220, 38, 38, 0.15), transparent 50%),
+                    radial-gradient(circle at 20% 80%, rgba(217, 119, 6, 0.1), transparent 50%),
+                    #0f0909 !important;
+        color: #f8fafc;
+    """
+    card_bg = "rgba(255, 255, 255, 0.02)"
+    card_border = "rgba(255, 255, 255, 0.05)"
+    text_color = "#f8fafc"
+    subtitle_color = "#94a3b8"
+    input_bg = "rgba(255, 255, 255, 0.02)"
+    input_border = "rgba(255, 255, 255, 0.05)"
+    btn_text = "#ffffff"
+    badge_bg = "rgba(255, 255, 255, 0.03)"
+    badge_color = "#cbd5e1"
+    nav_bg = "rgba(255, 255, 255, 0.03)"
+    title_gradient = "linear-gradient(135deg, #ffffff, #dc2626, #d97706)"
+else:
+    # Modo Claro (Marfim Quente com Destaques Crimson e Amber)
+    bg_gradient = """
+        background: radial-gradient(circle at 80% 20%, rgba(220, 38, 38, 0.1), transparent 50%),
+                    radial-gradient(circle at 20% 80%, rgba(217, 119, 6, 0.08), transparent 50%),
+                    #fdfbf7 !important;
+        color: #1e1b4b;
+    """
+    card_bg = "rgba(0, 0, 0, 0.02)"
+    card_border = "rgba(0, 0, 0, 0.06)"
+    text_color = "#1e1b4b"
+    subtitle_color = "#475569"
+    input_bg = "rgba(0, 0, 0, 0.01)"
+    input_border = "rgba(0, 0, 0, 0.08)"
+    btn_text = "#ffffff"
+    badge_bg = "rgba(0, 0, 0, 0.03)"
+    badge_color = "#475569"
+    nav_bg = "rgba(0, 0, 0, 0.02)"
+    title_gradient = "linear-gradient(135deg, #1e1b4b, #dc2626, #d97706)"
+
+st.markdown(f"""
+<style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;500;600;700;800&display=swap');
+
+    /* Fontes globais */
+    html, body, [class*="css"] {{
+        font-family: 'Inter', sans-serif;
+    }}
+    h1, h2, h3, h4, h5, h6 {{
+        font-family: 'Outfit', sans-serif;
+    }}
+
+    /* Fundo da aplicação */
+    .stApp {{
+        {bg_gradient}
+    }}
+
+    .main .block-container {{
+        padding-top: 1.5rem;
+        padding-bottom: 3rem;
+        max-width: 1100px;
+    }}
+
+    /* Painéis de vidro (Glassmorphism) */
+    .glass-panel {{
+        background: {card_bg} !important;
+        border: 1px solid {card_border} !important;
+        border-radius: 16px !important;
+        padding: 2rem !important;
+        backdrop-filter: blur(12px) !important;
+        box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.15) !important;
+        margin-bottom: 1.5rem !important;
+    }}
+
+    /* Estilo do Hero da Landing Page */
+    .hero-container {{
+        text-align: center;
+        padding: 3rem 1rem 2rem 1rem;
+    }}
+    .hero-badge {{
+        display: inline-block;
+        background: linear-gradient(135deg, rgba(220, 38, 38, 0.15), rgba(217, 119, 6, 0.15));
+        border: 1px solid rgba(217, 119, 6, 0.3);
+        color: #d97706;
+        padding: 0.35rem 1.2rem;
+        border-radius: 20px;
+        font-size: 0.85rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        margin-bottom: 1.5rem;
+    }}
+    .hero-title {{
+        font-size: 3.5rem;
+        font-weight: 800;
+        margin-bottom: 1rem;
+        background: linear-gradient(135deg, {text_color} 40%, #dc2626 70%, #d97706 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        letter-spacing: -1px;
+    }}
+    .hero-subtitle {{
+        font-size: 1.2rem;
+        color: {subtitle_color};
+        max-width: 650px;
+        margin: 0 auto 2.5rem auto;
+        line-height: 1.6;
+    }}
+
+    /* Cards de Recursos */
+    .feature-card {{
+        background: {card_bg};
+        border: 1px solid {card_border};
+        border-radius: 16px;
+        padding: 2.2rem 1.8rem;
+        text-align: center;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        height: 100%;
+    }}
+    .feature-card:hover {{
+        background: rgba(220, 38, 38, 0.02);
+        border-color: rgba(220, 38, 38, 0.3);
+        transform: translateY(-5px);
+        box-shadow: 0 12px 30px rgba(220, 38, 38, 0.08);
+    }}
+    .feature-icon {{
+        font-size: 2.8rem;
+        margin-bottom: 1.2rem;
+    }}
+    .feature-card h3 {{
+        font-size: 1.3rem;
+        font-weight: 700;
+        margin-bottom: 0.6rem;
+        color: {text_color};
+    }}
+    .feature-card p {{
+        color: {subtitle_color};
+        font-size: 0.9rem;
+        line-height: 1.5;
+        margin: 0;
+    }}
+
+    /* Custom badges */
+    .info-badge {{
+        display: inline-block;
+        background: {badge_bg};
+        color: {badge_color};
+        padding: 0.4rem 1rem;
+        border-radius: 20px;
+        font-size: 0.85rem;
+        margin-right: 0.5rem;
+        margin-bottom: 0.5rem;
+        border: 1px solid {card_border};
+        font-weight: 500;
+    }}
+
+    /* Botão Customizado (Vermelho e Amarelo) */
+    div.stButton > button {{
+        background: linear-gradient(135deg, #dc2626, #d97706) !important;
+        color: {btn_text} !important;
+        border: none !important;
+        font-weight: 600 !important;
+        font-size: 1rem !important;
+        border-radius: 8px !important;
+        padding: 0.6rem 2rem !important;
+        box-shadow: 0 4px 15px rgba(220, 38, 38, 0.25) !important;
+        transition: all 0.25s ease !important;
+        width: 100%;
+    }}
+    div.stButton > button:hover {{
+        transform: translateY(-2px) !important;
+        box-shadow: 0 6px 20px rgba(217, 119, 6, 0.35) !important;
+        color: {btn_text} !important;
+    }}
+
+    /* Botões Secundários */
+    div.stButton > button[kind="secondary"] {{
+        background: {card_bg} !important;
+        border: 1px solid {card_border} !important;
+        color: {text_color} !important;
+        box-shadow: none !important;
+    }}
+    div.stButton > button[kind="secondary"]:hover {{
+        background: rgba(220, 38, 38, 0.05) !important;
+        border-color: rgba(220, 38, 38, 0.2) !important;
+    }}
+
+    /* Customizações de inputs Streamlit */
+    textarea {{
+        background-color: {input_bg} !important;
+        border: 1px solid {input_border} !important;
+        color: {text_color} !important;
+        border-radius: 8px !important;
+    }}
+    textarea:focus {{
+        border-color: #d97706 !important;
+    }}
+
+    /* Estilo para barra de navegação */
+    div[data-baseweb="segmented-control"] {{
+        background-color: {nav_bg} !important;
+        border-radius: 12px;
+        padding: 4px;
+        border: 1px solid {card_border};
+    }}
+
+    .gradient-text {{
+        background: linear-gradient(135deg, #dc2626, #d97706);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+    }}
+
+    /* Ocultar elementos padrão do Streamlit */
+    #MainMenu {{visibility: hidden;}}
+    footer {{visibility: hidden;}}
+    header {{visibility: hidden;}}
+</style>
+""", unsafe_allow_html=True)
 
 # --- Dicionário de Vozes Neurais ---
 VOICES = {
@@ -279,15 +331,20 @@ def run_async(coro):
         future = executor.submit(asyncio.run, coro)
         return future.result()
 
-# --- 4. BARRA DE NAVEGAÇÃO SUPERIOR ---
-st.markdown("""
-<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
-    <div style="display: flex; align-items: center; gap: 10px;">
+# --- 4. BARRA DE NAVEGAÇÃO SUPERIOR COM ALTERNADOR DE TEMA ---
+col_title, col_theme = st.columns([4, 1.2])
+with col_title:
+    st.markdown(f"""
+    <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 1rem;">
         <span style="font-size: 2.25rem;">🎧</span>
-        <span style="font-family: 'Outfit', sans-serif; font-size: 1.6rem; font-weight: 800; background: linear-gradient(135deg, #ffffff, #c084fc, #22d3ee); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">Audiobook Studio</span>
+        <span style="font-family: 'Outfit', sans-serif; font-size: 1.6rem; font-weight: 800; background: {title_gradient}; -webkit-background-clip: text; -webkit-text-fill-color: transparent;">Audiobook Studio</span>
     </div>
-</div>
-""", unsafe_allow_html=True)
+    """, unsafe_allow_html=True)
+with col_theme:
+    theme_label = "☀️ Modo Claro" if st.session_state.dark_mode else "🌙 Modo Escuro"
+    if st.button(theme_label, use_container_width=True):
+        st.session_state.dark_mode = not st.session_state.dark_mode
+        st.rerun()
 
 # Abas de Navegação usando Segmented Control de forma customizada e limpa
 col_nav, _ = st.columns([2, 1])
