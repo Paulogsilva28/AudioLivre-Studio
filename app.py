@@ -26,38 +26,38 @@ if 'dark_mode' not in st.session_state:
 
 # --- 1. DEFINIÇÃO DA PALETA DE CORES (VERMELHO E AMARELO) E TEMA ---
 if st.session_state.dark_mode:
-    # Modo Escuro (Burgundy/Charcoal com Destaques Crimson e Amber)
+    # Modo Escuro (Fundo escuro profundo com base em vinho/grafite escuro)
     bg_gradient = """
-        background: radial-gradient(circle at 80% 20%, rgba(220, 38, 38, 0.15), transparent 50%),
-                    radial-gradient(circle at 20% 80%, rgba(217, 119, 6, 0.1), transparent 50%),
+        background: radial-gradient(circle at 80% 20%, rgba(220, 38, 38, 0.12), transparent 50%),
+                    radial-gradient(circle at 20% 80%, rgba(217, 119, 6, 0.08), transparent 50%),
                     #0f0909 !important;
         color: #f8fafc;
     """
     card_bg = "rgba(255, 255, 255, 0.02)"
-    card_border = "rgba(255, 255, 255, 0.05)"
+    card_border = "rgba(255, 255, 255, 0.06)"
     text_color = "#f8fafc"
     subtitle_color = "#94a3b8"
-    input_bg = "rgba(255, 255, 255, 0.02)"
-    input_border = "rgba(255, 255, 255, 0.05)"
+    input_bg = "rgba(255, 255, 255, 0.03)"
+    input_border = "rgba(255, 255, 255, 0.08)"
     btn_text = "#ffffff"
     badge_bg = "rgba(255, 255, 255, 0.03)"
     badge_color = "#cbd5e1"
-    nav_bg = "rgba(255, 255, 255, 0.03)"
+    nav_bg = "rgba(255, 255, 255, 0.02)"
     title_gradient = "linear-gradient(135deg, #ffffff, #dc2626, #d97706)"
 else:
     # Modo Claro (Marfim Quente com Destaques Crimson e Amber)
     bg_gradient = """
-        background: radial-gradient(circle at 80% 20%, rgba(220, 38, 38, 0.1), transparent 50%),
-                    radial-gradient(circle at 20% 80%, rgba(217, 119, 6, 0.08), transparent 50%),
+        background: radial-gradient(circle at 80% 20%, rgba(220, 38, 38, 0.08), transparent 50%),
+                    radial-gradient(circle at 20% 80%, rgba(217, 119, 6, 0.06), transparent 50%),
                     #fdfbf7 !important;
         color: #1e1b4b;
     """
-    card_bg = "rgba(0, 0, 0, 0.02)"
-    card_border = "rgba(0, 0, 0, 0.06)"
+    card_bg = "rgba(0, 0, 0, 0.015)"
+    card_border = "rgba(0, 0, 0, 0.08)"
     text_color = "#1e1b4b"
     subtitle_color = "#475569"
-    input_bg = "rgba(0, 0, 0, 0.01)"
-    input_border = "rgba(0, 0, 0, 0.08)"
+    input_bg = "rgba(0, 0, 0, 0.02)"
+    input_border = "rgba(0, 0, 0, 0.12)"
     btn_text = "#ffffff"
     badge_bg = "rgba(0, 0, 0, 0.03)"
     badge_color = "#475569"
@@ -87,15 +87,21 @@ st.markdown(f"""
         max-width: 1100px;
     }}
 
-    /* Painéis de vidro (Glassmorphism) */
-    .glass-panel {{
+    /* Estilização nativa dos containers com borda (Glassmorphism) */
+    div[data-testid="stVerticalBlockBorderWrapper"] {{
         background: {card_bg} !important;
         border: 1px solid {card_border} !important;
         border-radius: 16px !important;
-        padding: 2rem !important;
+        padding: 1.5rem !important;
         backdrop-filter: blur(12px) !important;
-        box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.15) !important;
-        margin-bottom: 1.5rem !important;
+        box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.1) !important;
+        margin-bottom: 1rem !important;
+    }}
+
+    /* Garante a visibilidade das labels dos inputs */
+    div[data-testid="stWidgetLabel"] p, label, .stMarkdown h4 {{
+        color: {text_color} !important;
+        font-weight: 600 !important;
     }}
 
     /* Estilo do Hero da Landing Page */
@@ -180,8 +186,8 @@ st.markdown(f"""
         font-weight: 500;
     }}
 
-    /* Botão Customizado (Vermelho e Amarelo) */
-    div.stButton > button {{
+    /* Botão Customizado - Seletor específico para stButton para não afetar outros botões nativos */
+    div[data-testid="stButton"] button {{
         background: linear-gradient(135deg, #dc2626, #d97706) !important;
         color: {btn_text} !important;
         border: none !important;
@@ -193,33 +199,28 @@ st.markdown(f"""
         transition: all 0.25s ease !important;
         width: 100%;
     }}
-    div.stButton > button:hover {{
+    div[data-testid="stButton"] button:hover {{
         transform: translateY(-2px) !important;
         box-shadow: 0 6px 20px rgba(217, 119, 6, 0.35) !important;
         color: {btn_text} !important;
     }}
 
-    /* Botões Secundários */
-    div.stButton > button[kind="secondary"] {{
-        background: {card_bg} !important;
-        border: 1px solid {card_border} !important;
-        color: {text_color} !important;
-        box-shadow: none !important;
-    }}
-    div.stButton > button[kind="secondary"]:hover {{
-        background: rgba(220, 38, 38, 0.05) !important;
-        border-color: rgba(220, 38, 38, 0.2) !important;
-    }}
-
-    /* Customizações de inputs Streamlit */
-    textarea {{
+    /* Customização específica do input text area */
+    div[data-baseweb="textarea"] {{
         background-color: {input_bg} !important;
         border: 1px solid {input_border} !important;
-        color: {text_color} !important;
         border-radius: 8px !important;
     }}
-    textarea:focus {{
-        border-color: #d97706 !important;
+    div[data-baseweb="textarea"] textarea {{
+        background-color: transparent !important;
+        color: {text_color} !important;
+    }}
+
+    /* Corrigir cores dos inputs normais */
+    div[data-baseweb="select"] > div {{
+        background-color: {input_bg} !important;
+        color: {text_color} !important;
+        border-color: {input_border} !important;
     }}
 
     /* Estilo para barra de navegação */
@@ -426,42 +427,40 @@ elif st.session_state.page == "editor":
     col_left, col_right = st.columns([1, 2.5])
     
     with col_left:
-        st.markdown('<div class="glass-panel">', unsafe_allow_html=True)
-        st.markdown("#### Carregar Documento")
-        uploaded_pdf = st.file_uploader(
-            "Arraste ou selecione seu arquivo PDF",
-            type=["pdf"],
-            label_visibility="collapsed"
-        )
-        
-        if uploaded_pdf:
-            with st.spinner("Extraindo texto do PDF..."):
-                texto_extraido = extrair_texto_pdf(uploaded_pdf)
-            st.success(f"Sucesso: {len(texto_extraido):,} caracteres extraídos!")
-            if not st.session_state.texto_final:
-                st.session_state.texto_final = texto_extraido
-        st.markdown('</div>', unsafe_allow_html=True)
+        with st.container(border=True):
+            st.markdown("#### Carregar Documento")
+            uploaded_pdf = st.file_uploader(
+                "Arraste ou selecione seu arquivo PDF",
+                type=["pdf"],
+                label_visibility="collapsed"
+            )
+            
+            if uploaded_pdf:
+                with st.spinner("Extraindo texto do PDF..."):
+                    texto_extraido = extrair_texto_pdf(uploaded_pdf)
+                st.success(f"Sucesso: {len(texto_extraido):,} caracteres extraídos!")
+                if not st.session_state.texto_final:
+                    st.session_state.texto_final = texto_extraido
 
     with col_right:
-        st.markdown('<div class="glass-panel">', unsafe_allow_html=True)
-        st.markdown("#### Conteúdo do Roteiro")
-        texto_editado = st.text_area(
-            "Edite o roteiro:",
-            value=st.session_state.texto_final,
-            height=380,
-            key="editor_texto_area",
-            label_visibility="collapsed",
-            placeholder="Cole seu texto aqui ou envie um PDF ao lado para começar..."
-        )
-        
-        if st.button("💾 Salvar Roteiro e ir para Gravação", use_container_width=True):
-            st.session_state.texto_final = texto_editado
-            if texto_editado.strip():
-                st.session_state.page = "studio"
-                st.rerun()
-            else:
-                st.warning("O editor está vazio! Adicione algum texto antes de salvar.")
-        st.markdown('</div>', unsafe_allow_html=True)
+        with st.container(border=True):
+            st.markdown("#### Conteúdo do Roteiro")
+            texto_editado = st.text_area(
+                "Edite o roteiro:",
+                value=st.session_state.texto_final,
+                height=380,
+                key="editor_texto_area",
+                label_visibility="collapsed",
+                placeholder="Cole seu texto aqui ou envie um PDF ao lado para começar..."
+            )
+            
+            if st.button("💾 Salvar Roteiro e ir para Gravação", use_container_width=True):
+                st.session_state.texto_final = texto_editado
+                if texto_editado.strip():
+                    st.session_state.page = "studio"
+                    st.rerun()
+                else:
+                    st.warning("O editor está vazio! Adicione algum texto antes de salvar.")
 
 # ==========================================
 # PÁGINA 3: ESTÚDIO DE ÁUDIO (🎙️ Estúdio)
@@ -489,55 +488,53 @@ elif st.session_state.page == "studio":
         col_settings, col_preview = st.columns([1.2, 2])
         
         with col_settings:
-            st.markdown('<div class="glass-panel" style="height: 100%;">', unsafe_allow_html=True)
-            st.markdown("#### Configurações da Voz")
-            
-            # Seletor de voz amigável
-            selected_voice_key = st.selectbox(
-                "Escolha o Narrador:",
-                options=list(VOICES.keys()),
-                format_func=lambda x: VOICES[x],
-                index=list(VOICES.keys()).index(st.session_state.voz) if st.session_state.voz in VOICES else 0
-            )
-            st.session_state.voz = selected_voice_key
-            
-            # Controle de velocidade (Rate)
-            velocidade_sel = st.slider(
-                "Velocidade de Fala:",
-                min_value=0.8,
-                max_value=1.3,
-                value=float(st.session_state.velocidade),
-                step=0.05
-            )
-            st.session_state.velocidade = velocidade_sel
-            
-            # Formatação do rate no padrão do edge-tts
-            rate_val = round((velocidade_sel - 1) * 100)
-            rate = f"+{rate_val}%" if rate_val >= 0 else f"{rate_val}%"
-            
-            st.markdown("<br>", unsafe_allow_html=True)
-            genero = "masculina" if "Antonio" in selected_voice_key or "Duarte" in selected_voice_key or "Guy" in selected_voice_key or "Alvaro" in selected_voice_key else "feminina"
-            st.markdown(
-                f'<div style="margin-top: 5px;">'
-                f'<span class="info-badge">Gênero: {genero}</span>'
-                f'<span class="info-badge">Ajuste de Velocidade: {rate}</span>'
-                f'</div>',
-                unsafe_allow_html=True
-            )
-            st.markdown('</div>', unsafe_allow_html=True)
+            with st.container(border=True):
+                st.markdown("#### Configurações da Voz")
+                
+                # Seletor de voz amigável
+                selected_voice_key = st.selectbox(
+                    "Escolha o Narrador:",
+                    options=list(VOICES.keys()),
+                    format_func=lambda x: VOICES[x],
+                    index=list(VOICES.keys()).index(st.session_state.voz) if st.session_state.voz in VOICES else 0
+                )
+                st.session_state.voz = selected_voice_key
+                
+                # Controle de velocidade (Rate)
+                velocidade_sel = st.slider(
+                    "Velocidade de Fala:",
+                    min_value=0.8,
+                    max_value=1.3,
+                    value=float(st.session_state.velocidade),
+                    step=0.05
+                )
+                st.session_state.velocidade = velocidade_sel
+                
+                # Formatação do rate no padrão do edge-tts
+                rate_val = round((velocidade_sel - 1) * 100)
+                rate = f"+{rate_val}%" if rate_val >= 0 else f"{rate_val}%"
+                
+                st.markdown("<br>", unsafe_allow_html=True)
+                genero = "masculina" if "Antonio" in selected_voice_key or "Duarte" in selected_voice_key or "Guy" in selected_voice_key or "Alvaro" in selected_voice_key else "feminina"
+                st.markdown(
+                    f'<div style="margin-top: 5px;">'
+                    f'<span class="info-badge">Gênero: {genero}</span>'
+                    f'<span class="info-badge">Ajuste de Velocidade: {rate}</span>'
+                    f'</div>',
+                    unsafe_allow_html=True
+                )
 
         with col_preview:
-            st.markdown('<div class="glass-panel">', unsafe_allow_html=True)
-            st.markdown("#### Visualização do Roteiro")
-            roteiro_confirmado = st.text_area(
-                "Revisão do roteiro:",
-                value=st.session_state.texto_final,
-                height=260,
-                key="roteiro_final_area",
-                label_visibility="collapsed"
-            )
-            st.session_state.texto_final = roteiro_confirmado
-            st.markdown('</div>', unsafe_allow_html=True)
+            with st.container(border=True):
+                st.markdown("#### Visualização do Roteiro")
+                roteiro_confirmado = st.text_area(
+                    "Revisão do roteiro:",
+                    value=st.session_state.texto_final,
+                    height=260,
+                    key="roteiro_final_area",
+                    label_visibility="collapsed"
+                )
+                st.session_state.texto_final = roteiro_confirmado
             
         st.markdown("<br>", unsafe_allow_html=True)
         
@@ -556,22 +553,21 @@ elif st.session_state.page == "studio":
                     status_text.text("Audiobook sintetizado com sucesso!")
                     progress_bar.progress(1.0, text="Concluído!")
                     
-                    st.markdown('<div class="glass-panel" style="margin-top: 2rem;">', unsafe_allow_html=True)
-                    st.markdown("#### Ouvir e Baixar seu Audiobook")
-                    
-                    col_audio, col_dl = st.columns([3, 1])
-                    with col_audio:
-                        st.audio(resultado.getvalue())
-                    with col_dl:
-                        st.download_button(
-                            label="⬇️ Baixar MP3",
-                            data=resultado.getvalue(),
-                            file_name="audiobook.mp3",
-                            mime="audio/mp3",
-                            type="primary",
-                            use_container_width=True
-                        )
-                    st.markdown('</div>', unsafe_allow_html=True)
+                    with st.container(border=True):
+                        st.markdown("#### Ouvir e Baixar seu Audiobook")
+                        
+                        col_audio, col_dl = st.columns([3, 1])
+                        with col_audio:
+                            st.audio(resultado.getvalue())
+                        with col_dl:
+                            st.download_button(
+                                label="⬇️ Baixar MP3",
+                                data=resultado.getvalue(),
+                                file_name="audiobook.mp3",
+                                mime="audio/mp3",
+                                type="primary",
+                                use_container_width=True
+                            )
             except Exception as e:
                 progress_bar.empty()
                 status_text.empty()
