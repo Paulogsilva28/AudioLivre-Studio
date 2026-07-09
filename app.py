@@ -32,7 +32,7 @@ if 'instrucoes_traducao' not in st.session_state:
 
 # --- 1. DEFINIÇÃO DA PALETA DE CORES (VERMELHO E AMARELO) E TEMA ---
 if st.session_state.dark_mode:
-    # Modo Escuro (Fundo escuro profundo com base em vinho/grafite escuro)
+    # Modo Escuro (Fundo escuro profissional)
     bg_gradient = """
         background: radial-gradient(circle at 80% 20%, rgba(220, 38, 38, 0.12), transparent 50%),
                     radial-gradient(circle at 20% 80%, rgba(217, 119, 6, 0.08), transparent 50%),
@@ -51,7 +51,7 @@ if st.session_state.dark_mode:
     nav_bg = "rgba(255, 255, 255, 0.02)"
     title_gradient = "linear-gradient(135deg, #ffffff, #dc2626, #d97706)"
 else:
-    # Modo Claro (Marfim Quente com Destaques Crimson e Amber)
+    # Modo Claro (Marfim Quente)
     bg_gradient = """
         background: radial-gradient(circle at 80% 20%, rgba(220, 38, 38, 0.08), transparent 50%),
                     radial-gradient(circle at 20% 80%, rgba(217, 119, 6, 0.06), transparent 50%),
@@ -420,16 +420,15 @@ with col_theme:
         st.rerun()
 
 # Barra de Navegação Separada
-col_nav, col_trans, _ = st.columns([2.5, 1.2, 1.0])
+col_nav, col_split, col_trans, _ = st.columns([1.8, 1.2, 1.2, 0.8])
 with col_nav:
     nav_options = {
         "home": "🏠 Início", 
         "editor": "📖 Editor de Texto", 
-        "splitter": "✂️ Divisor de PDF",
         "studio": "🎙️ Estúdio de Áudio"
     }
     
-    # Se o usuário estiver na aba do Tradutor, a seleção ativa do segmented control fica vazia
+    # Se o usuário estiver na aba do Tradutor ou do Divisor, a seleção ativa do segmented control fica vazia
     default_sel = st.session_state.page if st.session_state.page in nav_options else None
     
     selected_page = st.segmented_control(
@@ -441,6 +440,13 @@ with col_nav:
     )
     if selected_page and selected_page != st.session_state.page:
         st.session_state.page = selected_page
+        st.rerun()
+
+with col_split:
+    # Botão do Divisor de PDF afastado e isolado na navegação
+    is_splitter = (st.session_state.page == "splitter")
+    if st.button("✂️ Divisor de PDF", use_container_width=True, type="primary" if is_splitter else "secondary"):
+        st.session_state.page = "splitter"
         st.rerun()
 
 with col_trans:
@@ -465,8 +471,8 @@ if st.session_state.page == "home":
     </div>
     """, unsafe_allow_html=True)
 
-    # Grid de Recursos (4 Colunas)
-    col_feat1, col_feat2, col_feat3, col_feat4 = st.columns(4)
+    # Grid de Recursos (5 Colunas)
+    col_feat1, col_feat2, col_feat3, col_feat4, col_feat5 = st.columns(5)
     
     with col_feat1:
         st.markdown("""
@@ -480,13 +486,22 @@ if st.session_state.page == "home":
     with col_feat2:
         st.markdown("""
         <div class="feature-card">
+            <div class="feature-icon">✂️</div>
+            <h3>Divisor de PDF</h3>
+            <p>Divida arquivos grandes em blocos de 100 páginas ou intervalos customizados para facilitar o manuseio.</p>
+        </div>
+        """, unsafe_allow_html=True)
+
+    with col_feat3:
+        st.markdown("""
+        <div class="feature-card">
             <div class="feature-icon">🌐</div>
             <h3>Tradutor com IA</h3>
             <p>Traduza livros inteiros com a API do DeepSeek usando contextos e regras gramaticais personalizadas.</p>
         </div>
         """, unsafe_allow_html=True)
 
-    with col_feat3:
+    with col_feat4:
         st.markdown("""
         <div class="feature-card">
             <div class="feature-icon">🎙️</div>
@@ -495,7 +510,7 @@ if st.session_state.page == "home":
         </div>
         """, unsafe_allow_html=True)
 
-    with col_feat4:
+    with col_feat5:
         st.markdown("""
         <div class="feature-card">
             <div class="feature-icon">⚡</div>
