@@ -443,12 +443,12 @@ if st.session_state.page == "home":
     <div class="hero-container">
         <div class="hero-badge">Estúdio Profissional de Narração</div>
         <h1 class="hero-title">Seus PDFs em <span class="gradient-text">Audiobooks</span> de Alta Qualidade</h1>
-        <p class="hero-subtitle">Utilize vozes neurais ultrarrealistas de inteligência artificial para ler e converter seus documentos em MP3 de forma simples, elegante e totalmente gratuita.</p>
+        <p class="hero-subtitle">Utilize vozes neurais ultrarrealistas de inteligência artificial para ler, traduzir e converter seus documentos em MP3 de forma simples, elegante e totalmente gratuita.</p>
     </div>
     """, unsafe_allow_html=True)
 
-    # Grid de Recursos
-    col_feat1, col_feat2, col_feat3 = st.columns(3)
+    # Grid de Recursos (4 Colunas)
+    col_feat1, col_feat2, col_feat3, col_feat4 = st.columns(4)
     
     with col_feat1:
         st.markdown("""
@@ -462,13 +462,22 @@ if st.session_state.page == "home":
     with col_feat2:
         st.markdown("""
         <div class="feature-card">
+            <div class="feature-icon">🌐</div>
+            <h3>Tradutor com IA</h3>
+            <p>Traduza livros inteiros com a API do DeepSeek usando contextos e regras gramaticais personalizadas.</p>
+        </div>
+        """, unsafe_allow_html=True)
+
+    with col_feat3:
+        st.markdown("""
+        <div class="feature-card">
             <div class="feature-icon">🎙️</div>
             <h3>Vozes Neurais de IA</h3>
             <p>Selecione entre diversas vozes com tons masculinos e femininos em português brasileiro, europeu e inglês.</p>
         </div>
         """, unsafe_allow_html=True)
 
-    with col_feat3:
+    with col_feat4:
         st.markdown("""
         <div class="feature-card">
             <div class="feature-icon">⚡</div>
@@ -509,8 +518,8 @@ elif st.session_state.page == "editor":
                 with st.spinner("Extraindo texto do PDF..."):
                     texto_extraido = extrair_texto_pdf(uploaded_pdf)
                 st.success(f"Sucesso: {len(texto_extraido):,} caracteres extraídos!")
-                if not st.session_state.texto_final:
-                    st.session_state.texto_final = texto_extraido
+                st.session_state.texto_final = texto_extraido
+                st.session_state.editor_texto_area = texto_extraido
 
     with col_right:
         with st.container(border=True):
@@ -526,8 +535,9 @@ elif st.session_state.page == "editor":
             
             if st.button("💾 Salvar Roteiro", use_container_width=True):
                 st.session_state.texto_final = texto_editado
+                st.session_state.roteiro_final_area = texto_editado
                 if texto_editado.strip():
-                    st.success("Roteiro salvo com sucesso! Escolha o Tradutor DeepSeek ou o Estúdio de Áudio na barra superior.")
+                    st.success("Roteiro salv com sucesso! Escolha o Tradutor DeepSeek ou o Estúdio de Áudio na barra superior.")
                 else:
                     st.warning("O editor está vazio! Adicione algum texto antes de salvar.")
 
@@ -565,6 +575,7 @@ elif st.session_state.page == "translator":
                     texto_extraido = extrair_texto_pdf(uploaded_pdf)
                 st.success(f"PDF carregado: {len(texto_extraido):,} caracteres extraídos!")
                 st.session_state.texto_final = texto_extraido
+                st.session_state.translator_textarea = texto_extraido
 
         with st.container(border=True):
             st.markdown("#### 3. Prompts e Instruções")
@@ -668,6 +679,7 @@ Mantenha a fidelidade, fluidez de leitura, parágrafos e o tom literário origin
                     status_text.text("Tradução finalizada com sucesso!")
                     texto_final_traduzido = "\n\n".join(texto_traduzido_acumulado)
                     st.session_state.texto_final = texto_final_traduzido
+                    st.session_state.roteiro_final_area = texto_final_traduzido
                     
                     st.success("Tudo pronto! O texto traduzido foi salvo. Vá para o Estúdio de Áudio para gravar a narração em português.")
                     
