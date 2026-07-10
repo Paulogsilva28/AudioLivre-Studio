@@ -2,6 +2,7 @@ import streamlit as st
 import asyncio
 import edge_tts
 import io
+import time
 from pypdf import PdfReader, PdfWriter
 
 # --- 0. CONFIGURAÇÃO DA PÁGINA ---
@@ -29,6 +30,10 @@ if 'contexto_livro' not in st.session_state:
     st.session_state.contexto_livro = ""
 if 'instrucoes_traducao' not in st.session_state:
     st.session_state.instrucoes_traducao = ""
+if 'deepseek_model' not in st.session_state:
+    st.session_state.deepseek_model = "deepseek-chat"
+if 'translation_style' not in st.session_state:
+    st.session_state.translation_style = "Literário"
 
 # --- ÍCONES (URLs Públicas Icons8 / Flaticon) ---
 ICON_HEADER = "https://img.icons8.com/?size=100&id=h6KZp4Xmo1Je&format=png&color=000000"
@@ -317,6 +322,13 @@ VOICES = {
     "en-US-GuyNeural": "🇺🇸 Guy (Masculina)",
     "es-ES-ElviraNeural": "🇪🇸 Elvira (Feminina)",
     "es-ES-AlvaroNeural": "🇪🇸 Alvaro (Masculina)"
+}
+
+# --- Dicionário de Prompts de Estilo de Tradução ---
+STYLE_PROMPTS = {
+    "Literário": "Mantenha um estilo literário/narrativo rico, priorizando a fluidez e a beleza das sentenças como se fosse um romance.",
+    "Técnico/Formal": "Mantenha uma linguagem cirúrgica, técnica, objetiva e formal, traduzindo termos acadêmicos e científicos com precisão absoluta.",
+    "Coloquial/Informal": "Priorize a naturalidade cotidiana da fala, mantendo expressões coloquiais adequadas, diálogos dinâmicos e fluidos."
 }
 
 # --- 3. FUNÇÕES AUXILIARES ---
@@ -610,6 +622,23 @@ elif st.session_state.page == "translator":
             )
             st.session_state.deepseek_api_key = api_key
 
+            # Seleção de Modelo
+            api_model = st.selectbox(
+                "Modelo de Tradução:",
+                options=["deepseek-chat", "deepseek-reasoner"],
+                format_func=lambda x: "DeepSeek V3 (Chat - Rápido)" if x == "deepseek-chat" else "DeepSeek R1 (Reasoner - Raciocínio Profundo)",
+                index=0 if st.session_state.deepseek_model == "deepseek-chat" else 1
+            )
+            st.session_state.deepseek_model = api_model
+
+            # Seleção de Tom / Estilo
+            translation_style = st.selectbox(
+                "Estilo/Tom da Tradução:",
+                options=["Literário", "Técnico/Formal", "Coloquial/Informal"],
+                index=["Literário", "Técnico/Formal", "Coloquial/Informal"].index(st.session_state.translation_style)
+            )
+            st.session_state.translation_style = translation_style
+
             st.markdown("---")
             st.markdown("#### 2. Carregar Novo PDF (Inglês)")
             uploaded_pdf = st.file_uploader(
@@ -667,12 +696,13 @@ elif st.session_state.page == "translator":
                 chunks = split_text(st.session_state.texto_final, max_chars=2500)
                 total_chunks = len(chunks)
                 
-                st.info(f"Iniciando tradução de {total_chunks} partes...")
+                st.info(f"Iniciando tradução com o modelo {api_model} ({total_chunks} partes)...")
                 progress_bar = st.progress(0, text="Conectando com DeepSeek...")
                 status_text = st.empty()
                 
                 texto_traduzido_acumulado = []
                 sucesso = True
+                start_time = time.time()
                 
                 for i, chunk in enumerate(chunks):
                     status_text.text(f"Traduzindo parte {i+1} de {total_chunks}...")
@@ -689,25 +719,30 @@ elif st.session_state.page == "translator":
 O livro tem o seguinte contexto geral:
 {contexto}
 
+Estilo e Tom da Tradução:
+{STYLE_PROMPTS.get(translation_style, "Literário")}
+
 Instruções especiais de tradução a seguir estritamente:
 {instrucoes}
 
-Mantenha a fidelidade, fluidez de leitura, parágrafos e o tom literário original. Não invente explicações, não inclua notas e retorne APENAS o texto traduzido final."""
+Mantenha a fidelidade, fluidez de leitura, parágrafos e o tom original correspondente. Não invente explicações, não inclua notas e retorne APENAS o texto traduzido final."""
 
                         payload = {
-                            "model": "deepseek-chat",
+                            "model": api_model,
                             "messages": [
                                 {"role": "system", "content": system_prompt},
                                 {"role": "user", "content": chunk}
-                            ],
-                            "temperature": 0.3
+                            ]
                         }
+                        
+                        if api_model == "deepseek-chat":
+                            payload["temperature"] = 0.3
                         
                         response = requests.post(
                             "https://api.deepseek.com/chat/completions",
                             headers=headers,
                             json=payload,
-                            timeout=60
+                            timeout=90
                         )
                         
                         if response.status_code == 200:
@@ -724,13 +759,33 @@ Mantenha a fidelidade, fluidez de leitura, parágrafos e o tom literário origin
                         break
                 
                 if sucesso:
+                    total_duration = time.time() - start_time
                     progress_bar.progress(1.0, text="Concluído!")
-                    status_text.text("Tradução finalizada com sucesso!")
+                    status_text.text(f"Tradução finalizada em {total_duration:.1f} segundos!")
                     texto_final_traduzido = "\n\n".join(texto_traduzido_acumulado)
                     st.session_state.texto_final = texto_final_traduzido
                     st.session_state.roteiro_final_area = texto_final_traduzido
                     
                     st.success("Tudo pronto! O texto traduzido foi salvo. Vá para o Estúdio de Áudio para gravar a narração em português.")
+                    
+                    # Colunas para os botões de Download da tradução
+                    col_dl_txt, col_dl_md, _ = st.columns([1.5, 1.5, 3])
+                    with col_dl_txt:
+                        st.download_button(
+                            label="⬇️ Baixar como TXT",
+                            data=texto_final_traduzido,
+                            file_name="traducao.txt",
+                            mime="text/plain",
+                            use_container_width=True
+                        )
+                    with col_dl_md:
+                        st.download_button(
+                            label="⬇️ Baixar como Markdown",
+                            data=f"# Tradução - Audiobook\n\n{texto_final_traduzido}",
+                            file_name="traducao.md",
+                            mime="text/markdown",
+                            use_container_width=True
+                        )
                     
                     with st.expander("Visualizar Texto Traduzido"):
                         st.text_area("Resultado:", value=texto_final_traduzido, height=250, disabled=True)
