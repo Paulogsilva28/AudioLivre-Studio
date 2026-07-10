@@ -7,7 +7,7 @@ from pypdf import PdfReader, PdfWriter
 # --- 0. CONFIGURAÇÃO DA PÁGINA ---
 st.set_page_config(
     page_title="AudioLivre Studio",
-    page_icon="<a href="https://www.flaticon.com/br/icones-gratis/ouco" title="ouço ícones">Ouço ícones criados por Freepik - Flaticon</a>",
+    page_icon="🎧",
     layout="wide",
     initial_sidebar_state="collapsed"
 )
@@ -409,7 +409,7 @@ col_title, col_theme = st.columns([4, 1.2])
 with col_title:
     st.markdown(f"""
     <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 1rem;">
-        <span style="font-size: 2.25rem;"><a href="https://www.flaticon.com/br/icones-gratis/ouco" title="ouço ícones">Ouço ícones criados por Freepik - Flaticon</a></span>
+        <span style="font-size: 2.25rem;">🎧</span>
         <span class="header-title">AudioLivre Studio</span>
     </div>
     """, unsafe_allow_html=True)
@@ -583,7 +583,7 @@ elif st.session_state.page == "translator":
     # Mensagem de "Em Desenvolvimento"
     st.markdown("""
     <div style="background: rgba(217, 119, 6, 0.1); border: 1px solid #d97706; padding: 1rem; border-radius: 8px; margin-bottom: 1.5rem; text-align: left; font-size: 0.9rem; color: #f59e0b;">
-        <strong>⚠️ FUNCIONALIDADE EM DESENVOLVIMENTO:</strong> A aba de tradução automática via API do DeepSeek está em fase de testes e refinamentos. Certifique-se de usar chaves de API válidas e com cota disponível.
+        <strong>⚠️ FUNCIONALIDADE EM DESENVOLVIMENTO:</strong> A aba de tradução automática via API do DeepSeek está em fase de testes e refinamentos. Certifique-se de usar chaves de API válidas e respeitar os limites de uso.
     </div>
     """, unsafe_allow_html=True)
 
