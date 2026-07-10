@@ -41,14 +41,6 @@ ICON_DOWNLOAD = "https://cdn-icons-png.flaticon.com/512/2874/2874802.png" # Down
 # Filtro de cor para imagens inline do cabeçalho e landing page
 icon_filter = "filter: invert(1);" if st.session_state.dark_mode else "filter: none;"
 
-# Geração de ícones dinâmicos com a cor certa para os botões de navegação
-color_hex = "FFFFFF" if st.session_state.dark_mode else "1E1B4B"
-icon_nav_home = f"https://img.icons8.com/?size=22&id=83312&format=png&color={color_hex}"
-icon_nav_edit = f"https://img.icons8.com/?size=22&id=118633&format=png&color={color_hex}"
-icon_nav_studio = f"https://img.icons8.com/?size=22&id=84880&format=png&color={color_hex}"
-icon_nav_split = f"https://img.icons8.com/?size=22&id=jVl18QnaGIE3&format=png&color={color_hex}"
-icon_nav_translate = f"https://img.icons8.com/?size=22&id=byau012HFa7I&format=png&color={color_hex}"
-
 # --- 1. DEFINIÇÃO DA PALETA DE CORES (VERMELHO E AMARELO) E TEMA ---
 if st.session_state.dark_mode:
     # Modo Escuro (Fundo escuro profissional)
@@ -307,40 +299,6 @@ st.markdown(f"""
         -webkit-text-fill-color: transparent;
     }}
 
-    /* Injeção de Ícones Dinâmicos Icons8 nos botões de navegação */
-    div[data-baseweb="segmented-control"] button:nth-of-type(1) {{
-        background-image: url("{icon_nav_home}") !important;
-        background-repeat: no-repeat !important;
-        background-position: left 12px center !important;
-        padding-left: 38px !important;
-    }}
-    div[data-baseweb="segmented-control"] button:nth-of-type(2) {{
-        background-image: url("{icon_nav_edit}") !important;
-        background-repeat: no-repeat !important;
-        background-position: left 12px center !important;
-        padding-left: 38px !important;
-    }}
-    div[data-baseweb="segmented-control"] button:nth-of-type(3) {{
-        background-image: url("{icon_nav_studio}") !important;
-        background-repeat: no-repeat !important;
-        background-position: left 12px center !important;
-        padding-left: 38px !important;
-    }}
-
-    /* Injeção de Ícones Dinâmicos Icons8 nos botões isolados da direita */
-    div[data-testid="column"]:nth-of-type(2) div[data-testid="stButton"] button {{
-        background-image: url("{icon_nav_split}") !important;
-        background-repeat: no-repeat !important;
-        background-position: left 16px center !important;
-        padding-left: 42px !important;
-    }}
-    div[data-testid="column"]:nth-of-type(3) div[data-testid="stButton"] button {{
-        background-image: url("{icon_nav_translate}") !important;
-        background-repeat: no-repeat !important;
-        background-position: left 16px center !important;
-        padding-left: 42px !important;
-    }}
-
     /* Ocultar elementos padrão do Streamlit */
     #MainMenu {{visibility: hidden;}}
     footer {{visibility: hidden;}}
@@ -464,17 +422,18 @@ with col_title:
     """, unsafe_allow_html=True)
 with col_theme:
     theme_label = "Modo Claro" if st.session_state.dark_mode else "Modo Escuro"
-    if st.button(theme_label, use_container_width=True):
+    theme_icon = ":material/light_mode:" if st.session_state.dark_mode else ":material/dark_mode:"
+    if st.button(theme_label, icon=theme_icon, use_container_width=True):
         st.session_state.dark_mode = not st.session_state.dark_mode
         st.rerun()
 
 # Barra de Navegação Separada
-col_nav, col_split, col_trans, _ = st.columns([1.8, 1.2, 1.2, 0.8])
+col_nav, col_split, col_trans, _ = st.columns([2.0, 1.2, 1.2, 0.4])
 with col_nav:
     nav_options = {
-        "home": "Início", 
-        "editor": "Editor de Texto", 
-        "studio": "Estúdio de Áudio"
+        "home": ":material/home: Início", 
+        "editor": ":material/edit_note: Editor de Texto", 
+        "studio": ":material/spatial_audio: Estúdio de Áudio"
     }
     
     # Se o usuário estiver na aba do Tradutor ou do Divisor, a seleção ativa do segmented control fica vazia
@@ -494,14 +453,14 @@ with col_nav:
 with col_split:
     # Botão do Divisor de PDF afastado e isolado na navegação
     is_splitter = (st.session_state.page == "splitter")
-    if st.button("Divisor de PDF", use_container_width=True, type="primary" if is_splitter else "secondary"):
+    if st.button("Divisor de PDF", icon=":material/content_cut:", use_container_width=True, type="primary" if is_splitter else "secondary"):
         st.session_state.page = "splitter"
         st.rerun()
 
 with col_trans:
     # Botão do Tradutor DeepSeek afastado e isolado na navegação
     is_translator = (st.session_state.page == "translator")
-    if st.button("Tradutor DeepSeek", use_container_width=True, type="primary" if is_translator else "secondary"):
+    if st.button("Tradutor DeepSeek", icon=":material/translate:", use_container_width=True, type="primary" if is_translator else "secondary"):
         st.session_state.page = "translator"
         st.rerun()
 
