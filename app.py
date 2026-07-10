@@ -7,7 +7,7 @@ from pypdf import PdfReader, PdfWriter
 # --- 0. CONFIGURAÇÃO DA PÁGINA ---
 st.set_page_config(
     page_title="AudioLivre Studio",
-    page_icon="🎧",
+    page_icon="<a href="https://www.flaticon.com/br/icones-gratis/ouco" title="ouço ícones">Ouço ícones criados por Freepik - Flaticon</a>",
     layout="wide",
     initial_sidebar_state="collapsed"
 )
@@ -409,7 +409,7 @@ col_title, col_theme = st.columns([4, 1.2])
 with col_title:
     st.markdown(f"""
     <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 1rem;">
-        <span style="font-size: 2.25rem;">🎧</span>
+        <span style="font-size: 2.25rem;"><a href="https://www.flaticon.com/br/icones-gratis/ouco" title="ouço ícones">Ouço ícones criados por Freepik - Flaticon</a></span>
         <span class="header-title">AudioLivre Studio</span>
     </div>
     """, unsafe_allow_html=True)
