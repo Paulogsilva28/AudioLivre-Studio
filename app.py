@@ -30,6 +30,17 @@ if 'contexto_livro' not in st.session_state:
 if 'instrucoes_traducao' not in st.session_state:
     st.session_state.instrucoes_traducao = ""
 
+# --- ÍCONES FLATICON (URLs Públicas) ---
+ICON_HEADER = "https://cdn-icons-png.flaticon.com/512/59/59118.png"       # Fone de Ouvido
+ICON_IMPORT = "https://cdn-icons-png.flaticon.com/512/2232/2232688.png"   # Livro/Importador
+ICON_SPLIT = "https://cdn-icons-png.flaticon.com/512/3251/3251620.png"    # Tesoura/Divisor
+ICON_TRANSLATE = "https://cdn-icons-png.flaticon.com/512/826/826070.png"  # Globo/Tradutor
+ICON_VOICE = "https://cdn-icons-png.flaticon.com/512/709/709682.png"      # Microfone/Narrador
+ICON_DOWNLOAD = "https://cdn-icons-png.flaticon.com/512/2874/2874802.png" # Download/Áudio
+
+# Filtro de cor dos ícones baseado no tema escuro/claro
+icon_filter = "filter: invert(1);" if st.session_state.dark_mode else "filter: none;"
+
 # --- 1. DEFINIÇÃO DA PALETA DE CORES (VERMELHO E AMARELO) E TEMA ---
 if st.session_state.dark_mode:
     # Modo Escuro (Fundo escuro profissional)
@@ -173,10 +184,6 @@ st.markdown(f"""
         border-color: rgba(220, 38, 38, 0.3);
         transform: translateY(-5px);
         box-shadow: 0 12px 30px rgba(220, 38, 38, 0.08);
-    }}
-    .feature-icon {{
-        font-size: 2.8rem;
-        margin-bottom: 1.2rem;
     }}
     .feature-card h3 {{
         font-size: 1.3rem;
@@ -408,8 +415,8 @@ def run_async(coro):
 col_title, col_theme = st.columns([4, 1.2])
 with col_title:
     st.markdown(f"""
-    <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 1rem;">
-        <span style="font-size: 2.25rem;">🎧</span>
+    <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 1rem;">
+        <img src="{ICON_HEADER}" width="38" style="{icon_filter}" />
         <span class="header-title">AudioLivre Studio</span>
     </div>
     """, unsafe_allow_html=True)
@@ -471,49 +478,49 @@ if st.session_state.page == "home":
     </div>
     """, unsafe_allow_html=True)
 
-    # Grid de Recursos (5 Colunas)
+    # Grid de Recursos (5 Colunas com Ícones Flaticon)
     col_feat1, col_feat2, col_feat3, col_feat4, col_feat5 = st.columns(5)
     
     with col_feat1:
-        st.markdown("""
+        st.markdown(f"""
         <div class="feature-card">
-            <div class="feature-icon">📖</div>
+            <img src="{ICON_IMPORT}" width="54" style="{icon_filter} margin-bottom: 1.2rem;" />
             <h3>Importador Inteligente</h3>
             <p>Faça upload de documentos PDF e tenha todo o texto extraído de forma estruturada e imediata.</p>
         </div>
         """, unsafe_allow_html=True)
 
     with col_feat2:
-        st.markdown("""
+        st.markdown(f"""
         <div class="feature-card">
-            <div class="feature-icon">✂️</div>
+            <img src="{ICON_SPLIT}" width="54" style="{icon_filter} margin-bottom: 1.2rem;" />
             <h3>Divisor de PDF</h3>
             <p>Divida arquivos grandes em blocos de 100 páginas ou intervalos customizados para facilitar o manuseio.</p>
         </div>
         """, unsafe_allow_html=True)
 
     with col_feat3:
-        st.markdown("""
+        st.markdown(f"""
         <div class="feature-card">
-            <div class="feature-icon">🌐</div>
+            <img src="{ICON_TRANSLATE}" width="54" style="{icon_filter} margin-bottom: 1.2rem;" />
             <h3>Tradutor com IA</h3>
             <p>Traduza livros inteiros com a API do DeepSeek usando contextos e regras gramaticais personalizadas.</p>
         </div>
         """, unsafe_allow_html=True)
 
     with col_feat4:
-        st.markdown("""
+        st.markdown(f"""
         <div class="feature-card">
-            <div class="feature-icon">🎙️</div>
+            <img src="{ICON_VOICE}" width="54" style="{icon_filter} margin-bottom: 1.2rem;" />
             <h3>Vozes Neurais de IA</h3>
             <p>Selecione entre diversas vozes com tons masculinos e femininos em português brasileiro, europeu e inglês.</p>
         </div>
         """, unsafe_allow_html=True)
 
     with col_feat5:
-        st.markdown("""
+        st.markdown(f"""
         <div class="feature-card">
-            <div class="feature-icon">⚡</div>
+            <img src="{ICON_DOWNLOAD}" width="54" style="{icon_filter} margin-bottom: 1.2rem;" />
             <h3>Geração & Download</h3>
             <p>Sintetize grandes volumes de texto divididos em blocos e baixe o arquivo de áudio final em MP3.</p>
         </div>
