@@ -30,13 +30,13 @@ if 'contexto_livro' not in st.session_state:
 if 'instrucoes_traducao' not in st.session_state:
     st.session_state.instrucoes_traducao = ""
 
-# --- ÍCONES FLATICON (URLs Públicas) ---
-ICON_HEADER = "https://cdn-icons-png.flaticon.com/512/59/59118.png"       # Fone de Ouvido
-ICON_IMPORT = "https://cdn-icons-png.flaticon.com/512/2232/2232688.png"   # Livro/Importador
-ICON_SPLIT = "https://cdn-icons-png.flaticon.com/512/3251/3251620.png"    # Tesoura/Divisor
-ICON_TRANSLATE = "https://cdn-icons-png.flaticon.com/512/826/826070.png"  # Globo/Tradutor
-ICON_VOICE = "https://cdn-icons-png.flaticon.com/512/709/709682.png"      # Microfone/Narrador
-ICON_DOWNLOAD = "https://cdn-icons-png.flaticon.com/512/2874/2874802.png" # Download/Áudio
+# --- ÍCONES (URLs Públicas Icons8 / Flaticon) ---
+ICON_HEADER = "https://img.icons8.com/?size=100&id=h6KZp4Xmo1Je&format=png&color=000000"
+ICON_IMPORT = "https://img.icons8.com/?size=100&id=kuOHmVeRoVF5&format=png&color=000000"
+ICON_SPLIT = "https://img.icons8.com/?size=100&id=jVl18QnaGIE3&format=png&color=000000"
+ICON_TRANSLATE = "https://img.icons8.com/?size=100&id=byau012HFa7I&format=png&color=000000"
+ICON_VOICE = "https://cdn-icons-png.flaticon.com/512/709/709682.png"      # Microfone/Narrador (pode manter)
+ICON_DOWNLOAD = "https://cdn-icons-png.flaticon.com/512/2874/2874802.png" # Download/Áudio (pode manter)
 
 # Filtro de cor dos ícones baseado no tema escuro/claro
 icon_filter = "filter: invert(1);" if st.session_state.dark_mode else "filter: none;"
@@ -431,7 +431,7 @@ col_nav, col_split, col_trans, _ = st.columns([1.8, 1.2, 1.2, 0.8])
 with col_nav:
     nav_options = {
         "home": "🏠 Início", 
-        "editor": "📖 Editor de Texto", 
+        "editor": "📝 Editor de Texto", 
         "studio": "🎙️ Estúdio de Áudio"
     }
     
