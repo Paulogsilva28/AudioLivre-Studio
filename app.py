@@ -38,8 +38,16 @@ ICON_TRANSLATE = "https://img.icons8.com/?size=100&id=byau012HFa7I&format=png&co
 ICON_VOICE = "https://cdn-icons-png.flaticon.com/512/709/709682.png"      # Microfone/Narrador (pode manter)
 ICON_DOWNLOAD = "https://cdn-icons-png.flaticon.com/512/2874/2874802.png" # Download/Áudio (pode manter)
 
-# Filtro de cor dos ícones baseado no tema escuro/claro
+# Filtro de cor para imagens inline do cabeçalho e landing page
 icon_filter = "filter: invert(1);" if st.session_state.dark_mode else "filter: none;"
+
+# Geração de ícones dinâmicos com a cor certa para os botões de navegação
+color_hex = "FFFFFF" if st.session_state.dark_mode else "1E1B4B"
+icon_nav_home = f"https://img.icons8.com/?size=22&id=83312&format=png&color={color_hex}"
+icon_nav_edit = f"https://img.icons8.com/?size=22&id=118633&format=png&color={color_hex}"
+icon_nav_studio = f"https://img.icons8.com/?size=22&id=84880&format=png&color={color_hex}"
+icon_nav_split = f"https://img.icons8.com/?size=22&id=jVl18QnaGIE3&format=png&color={color_hex}"
+icon_nav_translate = f"https://img.icons8.com/?size=22&id=byau012HFa7I&format=png&color={color_hex}"
 
 # --- 1. DEFINIÇÃO DA PALETA DE CORES (VERMELHO E AMARELO) E TEMA ---
 if st.session_state.dark_mode:
@@ -299,6 +307,40 @@ st.markdown(f"""
         -webkit-text-fill-color: transparent;
     }}
 
+    /* Injeção de Ícones Dinâmicos Icons8 nos botões de navegação */
+    div[data-baseweb="segmented-control"] button:nth-of-type(1) {{
+        background-image: url("{icon_nav_home}") !important;
+        background-repeat: no-repeat !important;
+        background-position: left 12px center !important;
+        padding-left: 38px !important;
+    }}
+    div[data-baseweb="segmented-control"] button:nth-of-type(2) {{
+        background-image: url("{icon_nav_edit}") !important;
+        background-repeat: no-repeat !important;
+        background-position: left 12px center !important;
+        padding-left: 38px !important;
+    }}
+    div[data-baseweb="segmented-control"] button:nth-of-type(3) {{
+        background-image: url("{icon_nav_studio}") !important;
+        background-repeat: no-repeat !important;
+        background-position: left 12px center !important;
+        padding-left: 38px !important;
+    }}
+
+    /* Injeção de Ícones Dinâmicos Icons8 nos botões isolados da direita */
+    div[data-testid="column"]:nth-of-type(2) div[data-testid="stButton"] button {{
+        background-image: url("{icon_nav_split}") !important;
+        background-repeat: no-repeat !important;
+        background-position: left 16px center !important;
+        padding-left: 42px !important;
+    }}
+    div[data-testid="column"]:nth-of-type(3) div[data-testid="stButton"] button {{
+        background-image: url("{icon_nav_translate}") !important;
+        background-repeat: no-repeat !important;
+        background-position: left 16px center !important;
+        padding-left: 42px !important;
+    }}
+
     /* Ocultar elementos padrão do Streamlit */
     #MainMenu {{visibility: hidden;}}
     footer {{visibility: hidden;}}
@@ -421,7 +463,7 @@ with col_title:
     </div>
     """, unsafe_allow_html=True)
 with col_theme:
-    theme_label = "☀️ Modo Claro" if st.session_state.dark_mode else "🌙 Modo Escuro"
+    theme_label = "Modo Claro" if st.session_state.dark_mode else "Modo Escuro"
     if st.button(theme_label, use_container_width=True):
         st.session_state.dark_mode = not st.session_state.dark_mode
         st.rerun()
@@ -430,9 +472,9 @@ with col_theme:
 col_nav, col_split, col_trans, _ = st.columns([1.8, 1.2, 1.2, 0.8])
 with col_nav:
     nav_options = {
-        "home": "🏠 Início", 
-        "editor": "📝 Editor de Texto", 
-        "studio": "🎙️ Estúdio de Áudio"
+        "home": "Início", 
+        "editor": "Editor de Texto", 
+        "studio": "Estúdio de Áudio"
     }
     
     # Se o usuário estiver na aba do Tradutor ou do Divisor, a seleção ativa do segmented control fica vazia
@@ -452,14 +494,14 @@ with col_nav:
 with col_split:
     # Botão do Divisor de PDF afastado e isolado na navegação
     is_splitter = (st.session_state.page == "splitter")
-    if st.button("✂️ Divisor de PDF", use_container_width=True, type="primary" if is_splitter else "secondary"):
+    if st.button("Divisor de PDF", use_container_width=True, type="primary" if is_splitter else "secondary"):
         st.session_state.page = "splitter"
         st.rerun()
 
 with col_trans:
     # Botão do Tradutor DeepSeek afastado e isolado na navegação
     is_translator = (st.session_state.page == "translator")
-    if st.button("🌐 Tradutor DeepSeek", use_container_width=True, type="primary" if is_translator else "secondary"):
+    if st.button("Tradutor DeepSeek", use_container_width=True, type="primary" if is_translator else "secondary"):
         st.session_state.page = "translator"
         st.rerun()
 
@@ -590,7 +632,7 @@ elif st.session_state.page == "translator":
     # Mensagem de "Em Desenvolvimento"
     st.markdown("""
     <div style="background: rgba(217, 119, 6, 0.1); border: 1px solid #d97706; padding: 1rem; border-radius: 8px; margin-bottom: 1.5rem; text-align: left; font-size: 0.9rem; color: #f59e0b;">
-        <strong>⚠️ FUNCIONALIDADE EM DESENVOLVIMENTO:</strong> A aba de tradução automática via API do DeepSeek está em fase de testes e refinamentos. Certifique-se de usar chaves de API válidas e respeitar os limites de uso.
+        <strong>⚠️ FUNCIONALIDADE EM DESENVOLVIMENTO:</strong> A aba de tradução automática via API do DeepSeek está em fase de testes e refinamentos. Certifique-se de usar chaves de API válidas e com cota disponível.
     </div>
     """, unsafe_allow_html=True)
 
@@ -945,6 +987,6 @@ st.markdown("<br><br><br>", unsafe_allow_html=True)
 footer_color = "#94a3b8" if st.session_state.dark_mode else "#475569"
 st.markdown(f"""
 <div style="text-align: center; font-family: 'Outfit', sans-serif; font-size: 0.9rem; color: {footer_color}; padding-bottom: 2rem; border-top: 1px solid {card_border}; padding-top: 1.5rem;">
-    Desenvolvido por <a href="https://github.com/Paulogsilva28" target="_blank" style="color: #dc2626; font-weight: 700; text-decoration: none; border-bottom: 1px dashed #d97706;">Paulo Silva</a>
+    Desenvolvido com 🎧 por <a href="https://github.com/Paulogsilva28" target="_blank" style="color: #dc2626; font-weight: 700; text-decoration: none; border-bottom: 1px dashed #d97706;">Paulo Silva</a>
 </div>
 """, unsafe_allow_html=True)
