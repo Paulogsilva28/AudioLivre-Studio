@@ -4,6 +4,11 @@ from src.utils.translator_handler import traduzir_texto_deepseek
 from src.utils.tts_handler import run_async
 
 def render_translator():
+    # Sincroniza o estado do texto de tradução ao entrar na página
+    if "translator_textarea" not in st.session_state or not st.session_state.translator_textarea:
+        if "texto_final" in st.session_state and st.session_state.texto_final:
+            st.session_state.translator_textarea = st.session_state.texto_final
+
     st.markdown("### 🌐 Tradutor de PDF com IA (DeepSeek / Google)")
     
     # Mensagem informativa sobre gratuidade e consumo

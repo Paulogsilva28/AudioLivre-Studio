@@ -2,6 +2,11 @@ import streamlit as st
 from src.utils.pdf_handler import extrair_texto_pdf
 
 def render_editor():
+    # Sincroniza o estado do texto do editor ao entrar na página
+    if "editor_texto_area" not in st.session_state or not st.session_state.editor_texto_area:
+        if "texto_final" in st.session_state and st.session_state.texto_final:
+            st.session_state.editor_texto_area = st.session_state.texto_final
+
     st.markdown("### 📖 Editor e Extrator de Texto")
     st.caption("Faça upload de um PDF ou cole seu texto diretamente no editor de roteiro abaixo.")
     

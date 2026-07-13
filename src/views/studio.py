@@ -11,6 +11,11 @@ def render_studio():
             st.session_state.page = "editor"
             st.rerun()
     else:
+        # Sincroniza o estado do roteiro para o widget ao entrar na página
+        if "roteiro_final_area" not in st.session_state or not st.session_state.roteiro_final_area:
+            if "texto_final" in st.session_state and st.session_state.texto_final:
+                st.session_state.roteiro_final_area = st.session_state.texto_final
+
         chars = len(st.session_state.texto_final)
         chunks_count = len(split_text(st.session_state.texto_final))
         
