@@ -121,9 +121,13 @@ def render_studio():
                 st.markdown("##### 💾 Salvar na Biblioteca Local")
                 col_title_input, col_save_btn = st.columns([3.2, 1.8])
                 with col_title_input:
+                    # Define o título padrão do projeto com o nome do PDF (sem a extensão) se disponível
+                    default_title = ""
+                    if "pdf_filename" in st.session_state and st.session_state.pdf_filename:
+                        default_title = st.session_state.pdf_filename.rsplit('.', 1)[0]
                     project_title = st.text_input(
                         "Nome do Projeto / Livro:", 
-                        value="", 
+                        value=default_title, 
                         placeholder="Ex: Capítulo 1 - O Início",
                         label_visibility="collapsed",
                         key="save_project_title_input"

@@ -42,6 +42,10 @@ if 'translation_style' not in st.session_state:
     st.session_state.translation_style = "Literário"
 if 'audio_resultado_bytes' not in st.session_state:
     st.session_state.audio_resultado_bytes = None
+if 'pdf_filename' not in st.session_state:
+    st.session_state.pdf_filename = ""
+if 'translated_text' not in st.session_state:
+    st.session_state.translated_text = None
 
 # --- 2. INJEÇÃO DE ESTILOS CSS ---
 inject_global_css(st.session_state.dark_mode)

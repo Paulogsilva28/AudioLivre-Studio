@@ -23,6 +23,7 @@ def render_editor():
                 st.success(f"Sucesso: {len(texto_extraido):,} caracteres extraídos!")
                 st.session_state.texto_final = texto_extraido
                 st.session_state.editor_texto_area = texto_extraido
+                st.session_state.pdf_filename = uploaded_pdf.name
 
     with col_right:
         with st.container(border=True):

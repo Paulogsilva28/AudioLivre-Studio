@@ -59,10 +59,21 @@ def obter_audiobook(project_id):
     """Retorna o registro completo de um audiobook (incluindo áudio e textos) pelo ID."""
     conn = get_connection()
     cursor = conn.cursor()
-    cursor.execute("SELECT * FROM audiobooks WHERE id = ?", (project_id,))
+    cursor.execute("SELECT id, titulo, data_criacao, texto_original, texto_traduzido, audio_bytes, narrador, velocidade FROM audiobooks WHERE id = ?", (project_id,))
     row = cursor.fetchone()
     conn.close()
-    return row
+    if row:
+        return {
+            "id": row[0],
+            "titulo": row[1],
+            "data_criacao": row[2],
+            "texto_original": row[3],
+            "texto_traduzido": row[4],
+            "audio_bytes": bytes(row[5]) if row[5] else b"",
+            "narrador": row[6],
+            "velocidade": row[7]
+        }
+    return None
 
 def excluir_audiobook(project_id):
     """Deleta o registro do audiobook do banco de dados pelo ID."""

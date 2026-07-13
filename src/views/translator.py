@@ -49,7 +49,7 @@ def render_translator():
                     )
                     st.session_state.deepseek_api_key = api_key
             
-            # Seleção de Tom / Estilo (Aplicável a ambos, mas tem prompt customizado no DeepSeek)
+            # Seleção de Tom / Estilo
             translation_style = st.selectbox(
                 "Estilo/Tom da Tradução:",
                 options=["Literário", "Técnico/Formal", "Coloquial/Informal"],
@@ -72,6 +72,7 @@ def render_translator():
                 st.success(f"PDF carregado: {len(texto_extraido):,} caracteres extraídos!")
                 st.session_state.texto_final = texto_extraido
                 st.session_state.translator_textarea = texto_extraido
+                st.session_state.pdf_filename = uploaded_pdf.name
 
         with st.container(border=True):
             st.markdown("#### 3. Prompts e Instruções (DeepSeek)")
@@ -114,6 +115,7 @@ def render_translator():
             else:
                 progress_bar = st.progress(0, text="Preparando tradução...")
                 status_text = st.empty()
+                st.session_state.translated_text = None
                 
                 try:
                     # Executa a tradução assíncrona concorrente em paralelo
@@ -128,36 +130,40 @@ def render_translator():
                     status_text.text(f"Tradução finalizada em {total_duration:.1f} segundos!")
                     st.session_state.texto_final = texto_final_traduzido
                     st.session_state.roteiro_final_area = texto_final_traduzido
-                    
-                    st.success("Tudo pronto! O texto traduzido foi salvo. Vá para o Estúdio de Áudio para gravar a narração em português.")
-                    
-                    # Colunas para os botões de Download da tradução e navegação
-                    col_dl_txt, col_dl_md, col_nav_studio = st.columns([1.5, 1.5, 2])
-                    with col_dl_txt:
-                        st.download_button(
-                            label="⬇️ Baixar como TXT",
-                            data=texto_final_traduzido,
-                            file_name="traducao.txt",
-                            mime="text/plain",
-                            use_container_width=True
-                        )
-                    with col_dl_md:
-                        st.download_button(
-                            label="⬇️ Baixar como Markdown",
-                            data=f"# Tradução - Audiobook\n\n{texto_final_traduzido}",
-                            file_name="traducao.md",
-                            mime="text/markdown",
-                            use_container_width=True
-                        )
-                    with col_nav_studio:
-                        if st.button("🎙️ Estúdio de Gravação", use_container_width=True, type="primary"):
-                            st.session_state.page = "studio"
-                            st.rerun()
-                    
-                    with st.expander("Visualizar Texto Traduzido"):
-                        st.text_area("Resultado:", value=texto_final_traduzido, height=250, disabled=True)
-                        
+                    st.session_state.translated_text = texto_final_traduzido
                 except Exception as e:
                     progress_bar.empty()
                     status_text.empty()
                     st.error(f"Ocorreu um erro durante a tradução: {e}")
+                    st.session_state.translated_text = None
+
+        # Exibe as ações de download e navegação se houver tradução salva no estado global
+        if "translated_text" in st.session_state and st.session_state.translated_text:
+            st.markdown("<br>", unsafe_allow_html=True)
+            st.success("Tudo pronto! O texto traduzido foi salvo. Vá para o Estúdio de Áudio para gravar a narração em português.")
+            
+            # Colunas para os botões de Download da tradução e navegação
+            col_dl_txt, col_dl_md, col_nav_studio = st.columns([1.5, 1.5, 2])
+            with col_dl_txt:
+                st.download_button(
+                    label="⬇️ Baixar como TXT",
+                    data=st.session_state.translated_text,
+                    file_name="traducao.txt",
+                    mime="text/plain",
+                    use_container_width=True
+                )
+            with col_dl_md:
+                st.download_button(
+                    label="⬇️ Baixar como Markdown",
+                    data=f"# Tradução - Audiobook\n\n{st.session_state.translated_text}",
+                    file_name="traducao.md",
+                    mime="text/markdown",
+                    use_container_width=True
+                )
+            with col_nav_studio:
+                if st.button("🎙️ Estúdio de Gravação", use_container_width=True, type="primary"):
+                    st.session_state.page = "studio"
+                    st.rerun()
+            
+            with st.expander("Visualizar Texto Traduzido"):
+                st.text_area("Resultado:", value=st.session_state.translated_text, height=250, disabled=True)
