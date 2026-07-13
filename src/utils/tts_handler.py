@@ -35,23 +35,41 @@ def split_text(text, max_chars=3000):
         chunks.append(current)
     return [c for c in chunks if c.strip()]
 
+async def sintetizar_chunk(chunk, voz, rate):
+    """Sintetiza um único chunk de texto e retorna os bytes de áudio correspondentes."""
+    communicate = edge_tts.Communicate(chunk, voz, rate=rate)
+    chunk_buffer = io.BytesIO()
+    async for part in communicate.stream():
+        if part["type"] == "audio":
+            chunk_buffer.write(part["data"])
+    return chunk_buffer.getvalue()
+
 async def gerar_audiobook_com_progresso(texto, voz, rate, progress_bar, status_text):
-    """Gera áudio chunk por chunk atualizando a barra de progresso."""
+    """Gera áudio de forma concorrente (paralela) para todos os chunks e une tudo no final."""
     chunks = split_text(texto)
     total = len(chunks)
+    
+    if total == 0:
+        return io.BytesIO()
+
+    # Informar o início do processamento paralelo
+    status_text.text(f"Iniciando síntese paralela de {total} bloco(s) de narração...")
+    progress_bar.progress(0.1)
+
+    # Disparar tarefas concorrentes usando asyncio.gather
+    tasks = [sintetizar_chunk(chunk, voz, rate) for chunk in chunks]
+    audio_chunks_bytes = await asyncio.gather(*tasks)
+
+    # Concatenação e finalização
+    progress_bar.progress(0.9)
+    status_text.text("Concatenando faixas de áudio...")
+
     audio_buffer = io.BytesIO()
+    for chunk_bytes in audio_chunks_bytes:
+        audio_buffer.write(chunk_bytes)
 
-    for i, chunk in enumerate(chunks):
-        pct = i / total
-        progress_bar.progress(pct)
-        status_text.text(f"Sintetizando parte {i + 1} de {total}...")
-
-        communicate = edge_tts.Communicate(chunk, voz, rate=rate)
-        async for part in communicate.stream():
-            if part["type"] == "audio":
-                audio_buffer.write(part["data"])
-
-        progress_bar.progress((i + 1) / total)
+    progress_bar.progress(1.0)
+    status_text.text("Sintetizado com sucesso!")
 
     return audio_buffer
 
