@@ -3,10 +3,10 @@ from src.config import VOICES
 from src.utils.tts_handler import split_text, gerar_audiobook_com_progresso, run_async
 
 def render_studio():
-    st.markdown("### 🎙️ Estúdio de Gravação e Síntese de Voz")
+    st.markdown("### :material/spatial_audio: Estúdio de Gravação e Síntese de Voz")
     
     if not st.session_state.texto_final.strip():
-        st.info("⚠️ O roteiro está vazio. Envie um PDF, use o tradutor ou escreva algo na aba Editor de Texto antes de prosseguir.")
+        st.info("O roteiro está vazio. Envie um PDF, use o tradutor ou escreva algo na aba Editor de Texto antes de prosseguir.")
         if st.button("Ir para o Editor de Texto"):
             st.session_state.page = "editor"
             st.rerun()
@@ -81,7 +81,7 @@ def render_studio():
         st.markdown("<br>", unsafe_allow_html=True)
         
         # Botão de ação principal
-        if st.button("⚡ Gerar Áudio Final (MP3)", use_container_width=True):
+        if st.button("Gerar Áudio Final (MP3)", icon=":material/bolt:", use_container_width=True):
             progress_bar = st.progress(0, text="Iniciando sintetização...")
             status_text = st.empty()
             
@@ -114,7 +114,8 @@ def render_studio():
                     st.audio(st.session_state.audio_resultado_bytes)
                 with col_dl:
                     st.download_button(
-                        label="⬇️ Baixar MP3",
+                        label="Baixar MP3",
+                        icon=":material/download:",
                         data=st.session_state.audio_resultado_bytes,
                         file_name="audiolivre.mp3",
                         mime="audio/mp3",
@@ -123,7 +124,7 @@ def render_studio():
                     )
                 
                 st.divider()
-                st.markdown("##### 💾 Salvar na Biblioteca Local")
+                st.markdown("##### :material/save: Salvar na Biblioteca Local")
                 col_title_input, col_save_btn = st.columns([3.2, 1.8])
                 with col_title_input:
                     # Define o título padrão do projeto com o nome do PDF (sem a extensão) se disponível
@@ -138,7 +139,7 @@ def render_studio():
                         key="save_project_title_input"
                     )
                 with col_save_btn:
-                    if st.button("Salvar na Biblioteca", use_container_width=True):
+                    if st.button("Salvar na Biblioteca", icon=":material/save:", use_container_width=True):
                         if not project_title.strip():
                             st.warning("Digite um título!")
                         else:
@@ -157,6 +158,6 @@ def render_studio():
                                     narrador=saved_voice,
                                     velocidade=saved_speed
                                 )
-                                st.success("🎉 Salvo com sucesso na Biblioteca!")
+                                st.success("Salvo com sucesso na Biblioteca!")
                             except Exception as db_err:
                                 st.error(f"Erro ao salvar: {db_err}")

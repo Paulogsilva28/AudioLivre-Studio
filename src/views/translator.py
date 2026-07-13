@@ -9,12 +9,12 @@ def render_translator():
         if "texto_final" in st.session_state and st.session_state.texto_final:
             st.session_state.translator_textarea = st.session_state.texto_final
 
-    st.markdown("### 🌐 Tradutor de PDF com IA (DeepSeek / Google)")
+    st.markdown("### :material/translate: Tradutor de PDF com IA (DeepSeek / Google)")
     
     # Mensagem informativa sobre gratuidade e consumo
     st.markdown("""
     <div style="background: rgba(217, 119, 6, 0.1); border: 1px solid #d97706; padding: 1rem; border-radius: 8px; margin-bottom: 1.5rem; text-align: left; font-size: 0.9rem; color: #f59e0b;">
-        <strong>💡 ECONOMIA E SEGURANÇA:</strong> Escolha o <strong>Google Translate</strong> para traduções 100% gratuitas e sem limite de tokens. Para traduções literárias profundas, selecione o <strong>DeepSeek R1/V3</strong> (a chave global configurada nos segredos do servidor é usada automaticamente se disponível).
+        <strong>ECONOMIA E SEGURANÇA:</strong> Escolha o <strong>Google Translate</strong> para traduções 100% gratuitas e sem limite de tokens. Para traduções literárias profundas, selecione o <strong>DeepSeek R1/V3</strong> (a chave global configurada nos segredos do servidor é usada automaticamente se disponível).
     </div>
     """, unsafe_allow_html=True)
 
@@ -111,8 +111,8 @@ def render_translator():
             st.session_state.texto_final = texto_original
 
         # Botão de Ação de Tradução
-        btn_label = "🌐 Iniciar Tradução Gratuita" if api_model == "google" else "🌐 Iniciar Tradução com DeepSeek"
-        if st.button(btn_label, use_container_width=True):
+        btn_label = "Iniciar Tradução Gratuita" if api_model == "google" else "Iniciar Tradução com DeepSeek"
+        if st.button(btn_label, icon=":material/translate:", use_container_width=True):
             if api_model in ["deepseek-chat", "deepseek-reasoner"] and not api_key.strip():
                 st.error("Por favor, insira uma DeepSeek API Key válida nas configurações.")
             elif not st.session_state.texto_final.strip():
@@ -151,7 +151,8 @@ def render_translator():
             col_dl_txt, col_dl_md, col_nav_studio = st.columns([1.5, 1.5, 2])
             with col_dl_txt:
                 st.download_button(
-                    label="⬇️ Baixar como TXT",
+                    label="Baixar como TXT",
+                    icon=":material/download:",
                     data=st.session_state.translated_text,
                     file_name="traducao.txt",
                     mime="text/plain",
@@ -159,16 +160,17 @@ def render_translator():
                 )
             with col_dl_md:
                 st.download_button(
-                    label="⬇️ Baixar como Markdown",
+                    label="Baixar como Markdown",
+                    icon=":material/download:",
                     data=f"# Tradução - Audiobook\n\n{st.session_state.translated_text}",
                     file_name="traducao.md",
                     mime="text/markdown",
                     use_container_width=True
                 )
             with col_nav_studio:
-                if st.button("🎙️ Estúdio de Gravação", use_container_width=True, type="primary"):
+                if st.button("Estúdio de Gravação", icon=":material/spatial_audio:", use_container_width=True, type="primary"):
                     st.session_state.page = "studio"
                     st.rerun()
             
-            with st.expander("Visualizar Texto Traduzido"):
+            with st.expander("Visualizar Texto Traduzido", icon=":material/menu_book:"):
                 st.text_area("Resultado:", value=st.session_state.translated_text, height=250, disabled=True)

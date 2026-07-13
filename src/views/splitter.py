@@ -4,7 +4,7 @@ from pypdf import PdfReader
 from src.utils.pdf_handler import dividir_pdf
 
 def render_splitter():
-    st.markdown("### ✂️ Divisor de PDF")
+    st.markdown("### :material/content_cut: Divisor de PDF")
     st.caption("Divida livros e documentos PDF grandes em blocos de 100 páginas (ou em lotes personalizados) para facilitar a tradução e gravação.")
 
     col_left, col_right = st.columns([1.2, 2])
@@ -21,7 +21,7 @@ def render_splitter():
 
     with col_right:
         if not uploaded_pdf:
-            st.info("💡 Por favor, faça o upload de um arquivo PDF na coluna da esquerda para começar a divisão.")
+            st.info("Por favor, faça o upload de um arquivo PDF na coluna da esquerda para começar a divisão.")
         else:
             # Ler metadados do PDF
             pdf_bytes = uploaded_pdf.read()
@@ -31,7 +31,7 @@ def render_splitter():
             file_size_mb = len(pdf_bytes) / (1024 * 1024)
 
             with st.container(border=True):
-                st.markdown("#### 📊 Informações do Documento")
+                st.markdown("#### :material/bar_chart: Informações do Documento")
                 st.markdown(
                     f'<span class="info-badge">Arquivo: {file_name}</span> '
                     f'<span class="info-badge">Tamanho: {file_size_mb:.2f} MB</span> '
@@ -41,14 +41,14 @@ def render_splitter():
 
             # Escolha o modo de divisão
             with st.container(border=True):
-                st.markdown("#### ⚙️ Modo de Divisão")
+                st.markdown("#### :material/settings: Modo de Divisão")
                 modo_div = st.radio(
                     "Selecione o método de corte:",
                     ["Dividir de 100 em 100 páginas (Recomendado)", "Intervalo Personalizado"]
                 )
 
                 if modo_div == "Dividir de 100 em 100 páginas (Recomendado)":
-                    st.markdown("##### 📦 Lotes de Páginas Gerados")
+                    st.markdown("##### :material/inventory_2: Lotes de Páginas Gerados")
                     
                     # Gerar intervalos automáticos de 100 em 100
                     for start in range(1, total_pages + 1, 100):
@@ -61,7 +61,8 @@ def render_splitter():
                                 # Gera os bytes do PDF cortado em tempo de execução
                                 split_buffer = dividir_pdf(pdf_bytes, start, end)
                                 st.download_button(
-                                    label=f"⬇️ Baixar Páginas {start}-{end}",
+                                    label=f"Baixar Páginas {start}-{end}",
+                                    icon=":material/download:",
                                     data=split_buffer,
                                     file_name=f"{file_name.rsplit('.', 1)[0]}_paginas_{start}_{end}.pdf",
                                     mime="application/pdf",
@@ -71,7 +72,7 @@ def render_splitter():
                             except Exception as e:
                                 st.error(f"Erro ao dividir: {e}")
                 else:
-                    st.markdown("##### 🛠️ Intervalo Customizado")
+                    st.markdown("##### :material/build: Intervalo Customizado")
                     col_start, col_end = st.columns(2)
                     with col_start:
                         p_start = st.number_input("Página Inicial:", min_value=1, max_value=total_pages, value=1, step=1)
@@ -85,7 +86,8 @@ def render_splitter():
                         try:
                             split_buffer = dividir_pdf(pdf_bytes, int(p_start), int(p_end))
                             st.download_button(
-                                label=f"⬇️ Baixar PDF Customizado ({p_start}-{p_end})",
+                                label=f"Baixar PDF Customizado ({p_start}-{p_end})",
+                                icon=":material/download:",
                                 data=split_buffer,
                                 file_name=f"{file_name.rsplit('.', 1)[0]}_paginas_{p_start}_{p_end}.pdf",
                                 mime="application/pdf",

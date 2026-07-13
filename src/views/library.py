@@ -2,13 +2,13 @@ import streamlit as st
 from src.utils.db_handler import listar_audiobooks, obter_audiobook, excluir_audiobook
 
 def render_library():
-    st.markdown("### 📚 Biblioteca de Audiobooks")
+    st.markdown("### :material/library_books: Biblioteca de Audiobooks")
     st.caption("Veja, reproduza e baixe seus audiobooks gravados anteriormente.")
     
     projects = listar_audiobooks()
     
     if not projects:
-        st.info("💡 Sua biblioteca está vazia por enquanto! Vá para o Estúdio de Áudio, gere um MP3 e salve-o para vê-lo aqui.")
+        st.info("Sua biblioteca está vazia por enquanto! Vá para o Estúdio de Áudio, gere um MP3 e salve-o para vê-lo aqui.")
         return
         
     # Seletor de Projetos salvos
@@ -27,7 +27,7 @@ def render_library():
         
         with col_info:
             with st.container(border=True):
-                st.markdown(f"#### 📊 Detalhes: {project['titulo']}")
+                st.markdown(f"#### :material/info: Detalhes: {project['titulo']}")
                 st.markdown(
                     f'<span class="info-badge">Data de Gravação: {project["data_criacao"]}</span> '
                     f'<span class="info-badge">Narrador: {project["narrador"]}</span> '
@@ -35,16 +35,17 @@ def render_library():
                     unsafe_allow_html=True
                 )
                 
-                st.markdown("##### 🔊 Ouvir Audiobook")
+                st.markdown("##### :material/volume_up: Ouvir Audiobook")
                 st.audio(project['audio_bytes'])
                 
         with col_actions:
             with st.container(border=True):
-                st.markdown("#### ⚙️ Ações do Projeto")
+                st.markdown("#### :material/settings: Ações do Projeto")
                 
                 # Download do MP3
                 st.download_button(
-                    label="⬇️ Baixar Áudio (MP3)",
+                    label="Baixar Áudio (MP3)",
+                    icon=":material/download:",
                     data=project['audio_bytes'],
                     file_name=f"{project['titulo'].lower().replace(' ', '_')}.mp3",
                     mime="audio/mp3",
@@ -55,7 +56,8 @@ def render_library():
                 # Download do texto final/traduzido se existir
                 if project['texto_traduzido']:
                     st.download_button(
-                        label="📝 Baixar Tradução (.txt)",
+                        label="Baixar Tradução (.txt)",
+                        icon=":material/download:",
                         data=project['texto_traduzido'],
                         file_name=f"{project['titulo'].lower().replace(' ', '_')}_traducao.txt",
                         mime="text/plain",
@@ -64,13 +66,13 @@ def render_library():
                     
                 # Botão de Excluir
                 st.markdown("<br>", unsafe_allow_html=True)
-                if st.button("🗑️ Excluir Projeto", use_container_width=True):
+                if st.button("Excluir Projeto", icon=":material/delete:", use_container_width=True):
                     excluir_audiobook(selected_id)
                     st.success(f"Projeto '{project['titulo']}' excluído da biblioteca!")
                     st.rerun()
                     
         # Visualização dos Roteiros expandida
-        with st.expander("📖 Ver Roteiros de Texto"):
+        with st.expander("Ver Roteiros de Texto", icon=":material/menu_book:"):
             col_t1, col_t2 = st.columns(2)
             with col_t1:
                 st.markdown("**Texto Original:**")

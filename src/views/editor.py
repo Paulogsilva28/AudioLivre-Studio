@@ -7,7 +7,7 @@ def render_editor():
         if "texto_final" in st.session_state and st.session_state.texto_final:
             st.session_state.editor_texto_area = st.session_state.texto_final
 
-    st.markdown("### 📖 Editor e Extrator de Texto")
+    st.markdown("### :material/menu_book: Editor e Extrator de Texto")
     st.caption("Faça upload de um PDF ou cole seu texto diretamente no editor de roteiro abaixo.")
     
     # Layout de Duas Colunas (Upload na esquerda, editor/resumo na direita)
@@ -42,7 +42,7 @@ def render_editor():
                 placeholder="Cole seu texto aqui ou envie um PDF ao lado para começar..."
             )
             
-            if st.button("💾 Salvar Roteiro", use_container_width=True):
+            if st.button("Salvar Roteiro", icon=":material/save:", use_container_width=True):
                 st.session_state.texto_final = texto_editado
                 st.session_state.roteiro_final_area = texto_editado
                 if texto_editado.strip():
