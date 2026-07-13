@@ -40,6 +40,8 @@ if 'deepseek_model' not in st.session_state:
     st.session_state.deepseek_model = "google"
 if 'translation_style' not in st.session_state:
     st.session_state.translation_style = "Literário"
+if 'audio_resultado_bytes' not in st.session_state:
+    st.session_state.audio_resultado_bytes = None
 
 # --- 2. INJEÇÃO DE ESTILOS CSS ---
 inject_global_css(st.session_state.dark_mode)

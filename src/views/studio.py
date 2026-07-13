@@ -87,57 +87,67 @@ def render_studio():
                 )
                 
                 if resultado.getbuffer().nbytes > 0:
+                    st.session_state.audio_resultado_bytes = resultado.getvalue()
+                    st.session_state.audio_resultado_voice = selected_voice_key
+                    st.session_state.audio_resultado_speed = velocidade_sel
                     status_text.text("Audiolivro sintetizado com sucesso!")
                     progress_bar.progress(1.0, text="Concluído!")
-                    
-                    with st.container(border=True):
-                        st.markdown("#### Ouvir e Baixar seu Audiolivro")
-                        
-                        col_audio, col_dl = st.columns([3, 1])
-                        with col_audio:
-                            st.audio(resultado.getvalue())
-                        with col_dl:
-                            st.download_button(
-                                label="⬇️ Baixar MP3",
-                                data=resultado.getvalue(),
-                                file_name="audiolivre.mp3",
-                                mime="audio/mp3",
-                                type="primary",
-                                use_container_width=True
-                            )
-                        
-                        st.divider()
-                        st.markdown("##### 💾 Salvar na Biblioteca Local")
-                        col_title_input, col_save_btn = st.columns([3.2, 1.8])
-                        with col_title_input:
-                            project_title = st.text_input(
-                                "Nome do Projeto / Livro:", 
-                                value="", 
-                                placeholder="Ex: Capítulo 1 - O Início",
-                                label_visibility="collapsed",
-                                key="save_project_title_input"
-                            )
-                        with col_save_btn:
-                            if st.button("Salvar na Biblioteca", use_container_width=True):
-                                if not project_title.strip():
-                                    st.warning("Digite um título!")
-                                else:
-                                    from src.utils.db_handler import salvar_audiobook
-                                    texto_orig = st.session_state.get("translator_textarea", "") or st.session_state.texto_final
-                                    texto_trad = st.session_state.texto_final
-                                    try:
-                                        salvar_audiobook(
-                                            titulo=project_title.strip(),
-                                            texto_original=texto_orig,
-                                            texto_traduzido=texto_trad,
-                                            audio_bytes=resultado.getvalue(),
-                                            narrador=selected_voice_key,
-                                            velocidade=velocidade_sel
-                                        )
-                                        st.success("🎉 Salvo com sucesso!")
-                                    except Exception as db_err:
-                                        st.error(f"Erro ao salvar: {db_err}")
             except Exception as e:
                 progress_bar.empty()
                 status_text.empty()
                 st.error(f"Erro ao gerar áudio: {e}")
+                st.session_state.audio_resultado_bytes = None
+
+        # Exibir player e formulário de salvamento se houver áudio gerado ativo na sessão
+        if "audio_resultado_bytes" in st.session_state and st.session_state.audio_resultado_bytes:
+            st.markdown("<br>", unsafe_allow_html=True)
+            with st.container(border=True):
+                st.markdown("#### Ouvir e Baixar seu Audiolivro")
+                
+                col_audio, col_dl = st.columns([3, 1])
+                with col_audio:
+                    st.audio(st.session_state.audio_resultado_bytes)
+                with col_dl:
+                    st.download_button(
+                        label="⬇️ Baixar MP3",
+                        data=st.session_state.audio_resultado_bytes,
+                        file_name="audiolivre.mp3",
+                        mime="audio/mp3",
+                        type="primary",
+                        use_container_width=True
+                    )
+                
+                st.divider()
+                st.markdown("##### 💾 Salvar na Biblioteca Local")
+                col_title_input, col_save_btn = st.columns([3.2, 1.8])
+                with col_title_input:
+                    project_title = st.text_input(
+                        "Nome do Projeto / Livro:", 
+                        value="", 
+                        placeholder="Ex: Capítulo 1 - O Início",
+                        label_visibility="collapsed",
+                        key="save_project_title_input"
+                    )
+                with col_save_btn:
+                    if st.button("Salvar na Biblioteca", use_container_width=True):
+                        if not project_title.strip():
+                            st.warning("Digite um título!")
+                        else:
+                            from src.utils.db_handler import salvar_audiobook
+                            texto_orig = st.session_state.get("translator_textarea", "") or st.session_state.texto_final
+                            texto_trad = st.session_state.texto_final
+                            saved_voice = st.session_state.get("audio_resultado_voice", selected_voice_key)
+                            saved_speed = st.session_state.get("audio_resultado_speed", velocidade_sel)
+                            
+                            try:
+                                salvar_audiobook(
+                                    titulo=project_title.strip(),
+                                    texto_original=texto_orig,
+                                    texto_traduzido=texto_trad,
+                                    audio_bytes=st.session_state.audio_resultado_bytes,
+                                    narrador=saved_voice,
+                                    velocidade=saved_speed
+                                )
+                                st.success("🎉 Salvo com sucesso na Biblioteca!")
+                            except Exception as db_err:
+                                st.error(f"Erro ao salvar: {db_err}")
