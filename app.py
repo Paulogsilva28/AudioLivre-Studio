@@ -32,7 +32,7 @@ if 'contexto_livro' not in st.session_state:
 if 'instrucoes_traducao' not in st.session_state:
     st.session_state.instrucoes_traducao = ""
 if 'deepseek_model' not in st.session_state:
-    st.session_state.deepseek_model = "deepseek-chat"
+    st.session_state.deepseek_model = "google"
 if 'translation_style' not in st.session_state:
     st.session_state.translation_style = "Literário"
 
