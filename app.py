@@ -5,6 +5,8 @@ from src.views.editor import render_editor
 from src.views.translator import render_translator
 from src.views.splitter import render_splitter
 from src.views.studio import render_studio
+from src.views.library import render_library
+from src.utils.db_handler import init_db
 
 # --- 0. CONFIGURAÇÃO DA PÁGINA ---
 st.set_page_config(
@@ -13,6 +15,9 @@ st.set_page_config(
     layout="wide",
     initial_sidebar_state="collapsed"
 )
+
+# Inicializa banco de dados SQLite
+init_db()
 
 # --- 1. ESTADO GLOBAL ---
 if 'page' not in st.session_state:
@@ -63,7 +68,8 @@ with col_nav:
     nav_options = {
         "home": ":material/home: Início", 
         "editor": ":material/edit_note: Editor de Texto", 
-        "studio": ":material/spatial_audio: Estúdio de Áudio"
+        "studio": ":material/spatial_audio: Estúdio de Áudio",
+        "library": ":material/library_books: Biblioteca"
     }
     
     # Mantém o menu atualizado com a página ativa se ela estiver listada no menu segmentado
@@ -105,6 +111,8 @@ elif st.session_state.page == "splitter":
     render_splitter()
 elif st.session_state.page == "studio":
     render_studio()
+elif st.session_state.page == "library":
+    render_library()
 
 # --- 5. RODAPÉ DE CRÉDITOS ---
 st.markdown("<br><br><br>", unsafe_allow_html=True)

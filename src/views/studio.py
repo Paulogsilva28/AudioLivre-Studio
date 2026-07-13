@@ -105,6 +105,38 @@ def render_studio():
                                 type="primary",
                                 use_container_width=True
                             )
+                        
+                        st.divider()
+                        st.markdown("##### 💾 Salvar na Biblioteca Local")
+                        col_title_input, col_save_btn = st.columns([3.2, 1.8])
+                        with col_title_input:
+                            project_title = st.text_input(
+                                "Nome do Projeto / Livro:", 
+                                value="", 
+                                placeholder="Ex: Capítulo 1 - O Início",
+                                label_visibility="collapsed",
+                                key="save_project_title_input"
+                            )
+                        with col_save_btn:
+                            if st.button("Salvar na Biblioteca", use_container_width=True):
+                                if not project_title.strip():
+                                    st.warning("Digite um título!")
+                                else:
+                                    from src.utils.db_handler import salvar_audiobook
+                                    texto_orig = st.session_state.get("translator_textarea", "") or st.session_state.texto_final
+                                    texto_trad = st.session_state.texto_final
+                                    try:
+                                        salvar_audiobook(
+                                            titulo=project_title.strip(),
+                                            texto_original=texto_orig,
+                                            texto_traduzido=texto_trad,
+                                            audio_bytes=resultado.getvalue(),
+                                            narrador=selected_voice_key,
+                                            velocidade=velocidade_sel
+                                        )
+                                        st.success("🎉 Salvo com sucesso!")
+                                    except Exception as db_err:
+                                        st.error(f"Erro ao salvar: {db_err}")
             except Exception as e:
                 progress_bar.empty()
                 status_text.empty()

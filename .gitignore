@@ -21,3 +21,7 @@ Thumbs.db
 # Agent conversation logs and internal setups
 .agents/
 .claude/
+
+# Database files
+*.db
+audiolivre.db
