@@ -131,8 +131,8 @@ def render_translator():
                     
                     st.success("Tudo pronto! O texto traduzido foi salvo. Vá para o Estúdio de Áudio para gravar a narração em português.")
                     
-                    # Colunas para os botões de Download da tradução
-                    col_dl_txt, col_dl_md, _ = st.columns([1.5, 1.5, 3])
+                    # Colunas para os botões de Download da tradução e navegação
+                    col_dl_txt, col_dl_md, col_nav_studio = st.columns([1.5, 1.5, 2])
                     with col_dl_txt:
                         st.download_button(
                             label="⬇️ Baixar como TXT",
@@ -149,6 +149,10 @@ def render_translator():
                             mime="text/markdown",
                             use_container_width=True
                         )
+                    with col_nav_studio:
+                        if st.button("🎙️ Estúdio de Gravação", use_container_width=True, type="primary"):
+                            st.session_state.page = "studio"
+                            st.rerun()
                     
                     with st.expander("Visualizar Texto Traduzido"):
                         st.text_area("Resultado:", value=texto_final_traduzido, height=250, disabled=True)

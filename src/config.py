@@ -206,8 +206,9 @@ def inject_global_css(dark_mode):
             font-weight: 500;
         }}
 
-        /* Botão Customizado - Seletor específico para stButton para não afetar outros botões nativos */
-        div[data-testid="stButton"] button {{
+        /* Botão Customizado - Suporte a botões de clique e download */
+        div[data-testid="stButton"] button,
+        div[data-testid="stDownloadButton"] button {{
             background: linear-gradient(135deg, #dc2626, #d97706) !important;
             color: {c['btn_text']} !important;
             border: none !important;
@@ -219,7 +220,8 @@ def inject_global_css(dark_mode):
             transition: all 0.25s ease !important;
             width: 100%;
         }}
-        div[data-testid="stButton"] button:hover {{
+        div[data-testid="stButton"] button:hover,
+        div[data-testid="stDownloadButton"] button:hover {{
             transform: translateY(-2px) !important;
             box-shadow: 0 6px 20px rgba(217, 119, 6, 0.35) !important;
             color: {c['btn_text']} !important;
