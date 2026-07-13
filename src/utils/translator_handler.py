@@ -82,6 +82,13 @@ Mantenha a fidelidade, fluidez de leitura, parágrafos e o tom original correspo
         status_text.text(f"Traduzindo {len(tasks_to_run)} parte(s) não cacheada(s) em paralelo...")
         progress_bar.progress(0.2)
         
+        # Limita a no máximo 3 requisições simultâneas para evitar bloqueio por excesso de taxa (Rate Limits)
+        semaphore = asyncio.Semaphore(3)
+
+        async def run_with_sem(coro):
+            async with semaphore:
+                return await coro
+
         # Despachar chamadas baseando-se no modelo escolhido
         if api_model == "google":
             # Tradução gratuita usando Google Translator via deep-translator em threads concorrentes
@@ -99,8 +106,9 @@ Mantenha a fidelidade, fluidez de leitura, parágrafos e o tom original correspo
                 for t in tasks_to_run
             ]
             
-        # Executar todas as requisições em paralelo concorrente
-        resolved_translations = await asyncio.gather(*coroutines)
+        # Executar todas as requisições em paralelo concorrente controlado por semáforo
+        tasks = [run_with_sem(c) for c in coroutines]
+        resolved_translations = await asyncio.gather(*tasks)
         
         # Guardar no cache e preencher o array de resultados ordenados
         for idx, (original_idx, chunk, chunk_hash) in enumerate(tasks_to_run):

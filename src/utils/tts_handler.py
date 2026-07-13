@@ -45,7 +45,7 @@ async def sintetizar_chunk(chunk, voz, rate):
     return chunk_buffer.getvalue()
 
 async def gerar_audiobook_com_progresso(texto, voz, rate, progress_bar, status_text):
-    """Gera áudio de forma concorrente (paralela) para todos os chunks e une tudo no final."""
+    """Gera áudio de forma concorrente limitada para evitar bloqueios de rede do Edge TTS."""
     chunks = split_text(texto)
     total = len(chunks)
     
@@ -53,11 +53,18 @@ async def gerar_audiobook_com_progresso(texto, voz, rate, progress_bar, status_t
         return io.BytesIO()
 
     # Informar o início do processamento paralelo
-    status_text.text(f"Iniciando síntese paralela de {total} bloco(s) de narração...")
+    status_text.text(f"Iniciando síntese de {total} bloco(s) (concorrência controlada)...")
     progress_bar.progress(0.1)
 
-    # Disparar tarefas concorrentes usando asyncio.gather
-    tasks = [sintetizar_chunk(chunk, voz, rate) for chunk in chunks]
+    # Limita a no máximo 5 conexões simultâneas para evitar que o servidor Microsoft Edge bloqueie por excesso de requisições (rate limiting)
+    semaphore = asyncio.Semaphore(5)
+
+    async def sintetizar_com_limite(chunk_text):
+        async with semaphore:
+            return await sintetizar_chunk(chunk_text, voz, rate)
+
+    # Disparar tarefas concorrentes controladas
+    tasks = [sintetizar_com_limite(chunk) for chunk in chunks]
     audio_chunks_bytes = await asyncio.gather(*tasks)
 
     # Concatenação e finalização
