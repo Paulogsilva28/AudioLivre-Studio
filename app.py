@@ -102,7 +102,7 @@ with col_split:
 
 with col_trans:
     is_translator = (st.session_state.page == "translator")
-    if st.button("Tradutor DeepSeek", icon=":material/translate:", use_container_width=True, type="primary" if is_translator else "secondary"):
+    if st.button("Tradutor com IA", icon=":material/translate:", use_container_width=True, type="primary" if is_translator else "secondary"):
         st.session_state.page = "translator"
         st.rerun()
 
