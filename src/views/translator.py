@@ -29,20 +29,20 @@ def render_translator():
             # Seleção de Modelo
             api_model = st.selectbox(
                 "Modelo de Tradução:",
-                options=["google", "gemini-1.5-flash", "deepseek-chat", "deepseek-reasoner"],
+                options=["google", "gemini-3.5-flash", "deepseek-chat", "deepseek-reasoner"],
                 format_func=lambda x: {
                     "google": "Google Translate (Gratuito - Sem Chave)",
-                    "gemini-1.5-flash": "Gemini 1.5 Flash (Gratuito - Com Chave)",
+                    "gemini-3.5-flash": "Gemini 3.5 Flash (Gratuito - Com Chave)",
                     "deepseek-chat": "DeepSeek V3 (Chat - Rápido)",
                     "deepseek-reasoner": "DeepSeek R1 (Reasoner - Raciocínio)"
                 }[x],
-                index=["google", "gemini-1.5-flash", "deepseek-chat", "deepseek-reasoner"].index(st.session_state.deepseek_model) if st.session_state.deepseek_model in ["google", "gemini-1.5-flash", "deepseek-chat", "deepseek-reasoner"] else 0
+                index=["google", "gemini-3.5-flash", "deepseek-chat", "deepseek-reasoner"].index(st.session_state.deepseek_model) if st.session_state.deepseek_model in ["google", "gemini-3.5-flash", "deepseek-chat", "deepseek-reasoner"] else 0
             )
             st.session_state.deepseek_model = api_model
 
             # Configuração e Ocultação Inteligente da Chave de API
             api_key = ""
-            if api_model == "gemini-1.5-flash":
+            if api_model == "gemini-3.5-flash":
                 if "GEMINI_API_KEY" in st.secrets and st.secrets["GEMINI_API_KEY"].strip():
                     api_key = st.secrets["GEMINI_API_KEY"]
                     st.success("🔒 Chave API do Gemini autenticada pelo servidor!")
@@ -126,13 +126,13 @@ def render_translator():
         # Botão de Ação de Tradução
         if api_model == "google":
             btn_label = "Iniciar Tradução Gratuita"
-        elif api_model == "gemini-1.5-flash":
+        elif api_model == "gemini-3.5-flash":
             btn_label = "Iniciar Tradução com Gemini"
         else:
             btn_label = "Iniciar Tradução com DeepSeek"
 
         if st.button(btn_label, icon=":material/translate:", use_container_width=True):
-            if api_model == "gemini-1.5-flash" and not api_key.strip():
+            if api_model == "gemini-3.5-flash" and not api_key.strip():
                 st.error("Por favor, insira uma Gemini API Key válida nas configurações.")
             elif api_model in ["deepseek-chat", "deepseek-reasoner"] and not api_key.strip():
                 st.error("Por favor, insira uma DeepSeek API Key válida nas configurações.")

@@ -36,8 +36,8 @@ def call_deepseek_api(api_key, api_model, system_prompt, chunk):
         raise Exception(f"Status {response.status_code} - {response.text}")
 
 def call_gemini_api(api_key, system_prompt, chunk):
-    """Realiza a chamada HTTP síncrona para a API do Gemini 1.5 Flash."""
-    url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key={api_key}"
+    """Realiza a chamada HTTP síncrona para a API do Gemini 3.5 Flash."""
+    url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-3.5-flash:generateContent?key={api_key}"
     headers = {
         "Content-Type": "application/json"
     }
@@ -126,7 +126,7 @@ Mantenha a fidelidade, fluidez de leitura, parágrafos e o tom original correspo
                 )
                 for t in tasks_to_run
             ]
-        elif api_model == "gemini-1.5-flash":
+        elif api_model == "gemini-3.5-flash":
             # Tradução via Gemini API
             coroutines = [
                 asyncio.to_thread(call_gemini_api, api_key, system_prompt, t[1])
