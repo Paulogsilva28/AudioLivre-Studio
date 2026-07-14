@@ -59,13 +59,33 @@ async def gerar_audiobook_com_progresso(texto, voz, rate, progress_bar, status_t
     # Limita a no máximo 5 conexões simultâneas para evitar que o servidor Microsoft Edge bloqueie por excesso de requisições (rate limiting)
     semaphore = asyncio.Semaphore(5)
 
-    async def sintetizar_com_limite(chunk_text):
+    # Indexamos as tarefas para manter a ordem correta dos áudios no final
+    async def sintetizar_com_limite_e_idx(idx, chunk_text):
         async with semaphore:
-            return await sintetizar_chunk(chunk_text, voz, rate)
+            bytes_data = await sintetizar_chunk(chunk_text, voz, rate)
+            return idx, bytes_data
 
     # Disparar tarefas concorrentes controladas
-    tasks = [sintetizar_com_limite(chunk) for chunk in chunks]
-    audio_chunks_bytes = await asyncio.gather(*tasks)
+    tasks = [sintetizar_com_limite_e_idx(i, chunk) for i, chunk in enumerate(chunks)]
+    
+    audio_chunks_bytes = [None] * total
+    completed = 0
+    
+    # Processa e atualiza o progresso dinamicamente conforme cada bloco termina
+    for future in asyncio.as_completed(tasks):
+        idx, chunk_bytes = await future
+        audio_chunks_bytes[idx] = chunk_bytes
+        completed += 1
+        
+        # O progresso varia de 10% (0.1) a 90% (0.9)
+        pct = 0.1 + (0.8 * (completed / total))
+        pct_display = int((completed / total) * 100)
+        
+        progress_bar.progress(
+            min(pct, 0.9), 
+            text=f"Sintetizando áudio: {completed}/{total} blocos ({pct_display}%)"
+        )
+        status_text.text(f"Gerando áudio neural... {pct_display}% completo ({completed} de {total} blocos)")
 
     # Concatenação e finalização
     progress_bar.progress(0.9)

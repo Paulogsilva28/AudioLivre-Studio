@@ -111,16 +111,19 @@ Mantenha a fidelidade, fluidez de leitura, parágrafos e o tom original correspo
         if api_model == "gemini-3.5-flash":
             # Tradução sequencial com controle estrito de taxa (5 RPM) para o plano gratuito do Gemini
             resolved_translations = []
+            total_tasks = len(tasks_to_run)
             for idx, t in enumerate(tasks_to_run):
-                status_text.text(f"Traduzindo lote {idx+1}/{len(tasks_to_run)} com Gemini...")
-                progress_bar.progress(0.2 + (0.7 * (idx / len(tasks_to_run))))
+                pct = 0.2 + (0.7 * (idx / total_tasks))
+                pct_display = int((idx / total_tasks) * 100)
+                status_text.text(f"Traduzindo lote {idx+1}/{total_tasks} ({pct_display}%) com Gemini...")
+                progress_bar.progress(pct, text=f"Traduzindo: {idx+1}/{total_tasks} partes ({pct_display}%)")
                 
                 # Executa a chamada
                 translation = await asyncio.to_thread(call_gemini_api, api_key, system_prompt, t[1])
                 resolved_translations.append(translation)
                 
                 # Aguarda 13 segundos entre as requisições se não for o último lote, para garantir que não ultrapasse a taxa de 5 requisições por minuto (5 RPM)
-                if idx < len(tasks_to_run) - 1:
+                if idx < total_tasks - 1:
                     status_text.text(f"Aguardando 13s para respeitar limite de cota gratuita (RPM)...")
                     await asyncio.sleep(13)
         else:
@@ -151,9 +154,27 @@ Mantenha a fidelidade, fluidez de leitura, parágrafos e o tom original correspo
                     for t in tasks_to_run
                 ]
                 
-            # Executar todas as requisições em paralelo concorrente controlado por semáforo
-            tasks = [run_with_sem(c) for c in coroutines]
-            resolved_translations = await asyncio.gather(*tasks)
+            # Mapeia as coroutines com o índice
+            async def run_with_idx(idx, coro):
+                res = await coro
+                return idx, res
+                
+            tasks_with_idx = [run_with_idx(i, run_with_sem(c)) for i, c in enumerate(coroutines)]
+            
+            resolved_translations = [None] * len(tasks_to_run)
+            completed = 0
+            for future in asyncio.as_completed(tasks_with_idx):
+                idx, translation = await future
+                resolved_translations[idx] = translation
+                completed += 1
+                
+                pct = 0.2 + (0.7 * (completed / len(tasks_to_run)))
+                pct_display = int((completed / len(tasks_to_run)) * 100)
+                progress_bar.progress(
+                    min(pct, 0.9),
+                    text=f"Traduzindo: {completed}/{len(tasks_to_run)} partes ({pct_display}%)"
+                )
+                status_text.text(f"Traduzindo com IA... {pct_display}% completo ({completed} de {len(tasks_to_run)} partes)")
         
         # Guardar no cache e preencher o array de resultados ordenados
         for idx, (original_idx, chunk, chunk_hash) in enumerate(tasks_to_run):
