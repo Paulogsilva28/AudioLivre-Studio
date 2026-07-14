@@ -64,7 +64,9 @@ def call_gemini_api(api_key, system_prompt, chunk):
 
 async def traduzir_texto_deepseek(api_key, api_model, translation_style, contexto, instrucoes, texto_completo, progress_bar, status_text):
     """Realiza a tradução de todo o texto de forma concorrente em paralelo com cache MD5 inteligente."""
-    chunks = split_text(texto_completo, max_chars=2500)
+    # Define o tamanho do bloco dependendo do modelo (Gemini aceita blocos maiores de 25k caracteres)
+    max_chars = 25000 if api_model == "gemini-3.5-flash" else 2500
+    chunks = split_text(texto_completo, max_chars=max_chars)
     total_chunks = len(chunks)
     
     if total_chunks == 0:
@@ -106,42 +108,52 @@ Mantenha a fidelidade, fluidez de leitura, parágrafos e o tom original correspo
             tasks_to_run.append((i, chunk, chunk_hash))
 
     if tasks_to_run:
-        status_text.text(f"Traduzindo {len(tasks_to_run)} parte(s) não cacheada(s) em paralelo...")
-        progress_bar.progress(0.2)
-        
-        # Limita a no máximo 3 requisições simultâneas para evitar bloqueio por excesso de taxa (Rate Limits)
-        semaphore = asyncio.Semaphore(3)
-
-        async def run_with_sem(coro):
-            async with semaphore:
-                return await coro
-
-        # Despachar chamadas baseando-se no modelo escolhido
-        if api_model == "google":
-            # Tradução gratuita usando Google Translator via deep-translator em threads concorrentes
-            coroutines = [
-                asyncio.to_thread(
-                    lambda text: GoogleTranslator(source='auto', target='pt').translate(text),
-                    t[1]
-                )
-                for t in tasks_to_run
-            ]
-        elif api_model == "gemini-3.5-flash":
-            # Tradução via Gemini API
-            coroutines = [
-                asyncio.to_thread(call_gemini_api, api_key, system_prompt, t[1])
-                for t in tasks_to_run
-            ]
+        if api_model == "gemini-3.5-flash":
+            # Tradução sequencial com controle estrito de taxa (5 RPM) para o plano gratuito do Gemini
+            resolved_translations = []
+            for idx, t in enumerate(tasks_to_run):
+                status_text.text(f"Traduzindo lote {idx+1}/{len(tasks_to_run)} com Gemini...")
+                progress_bar.progress(0.2 + (0.7 * (idx / len(tasks_to_run))))
+                
+                # Executa a chamada
+                translation = await asyncio.to_thread(call_gemini_api, api_key, system_prompt, t[1])
+                resolved_translations.append(translation)
+                
+                # Aguarda 13 segundos entre as requisições se não for o último lote, para garantir que não ultrapasse a taxa de 5 requisições por minuto (5 RPM)
+                if idx < len(tasks_to_run) - 1:
+                    status_text.text(f"Aguardando 13s para respeitar limite de cota gratuita (RPM)...")
+                    await asyncio.sleep(13)
         else:
-            # Tradução via DeepSeek API
-            coroutines = [
-                asyncio.to_thread(call_deepseek_api, api_key, api_model, system_prompt, t[1])
-                for t in tasks_to_run
-            ]
+            status_text.text(f"Traduzindo {len(tasks_to_run)} parte(s) não cacheada(s) em paralelo...")
+            progress_bar.progress(0.2)
             
-        # Executar todas as requisições em paralelo concorrente controlado por semáforo
-        tasks = [run_with_sem(c) for c in coroutines]
-        resolved_translations = await asyncio.gather(*tasks)
+            # Limita a no máximo 3 requisições simultâneas para evitar bloqueio por excesso de taxa (Rate Limits)
+            semaphore = asyncio.Semaphore(3)
+
+            async def run_with_sem(coro):
+                async with semaphore:
+                    return await coro
+
+            # Despachar chamadas baseando-se no modelo escolhido
+            if api_model == "google":
+                # Tradução gratuita usando Google Translator via deep-translator em threads concorrentes
+                coroutines = [
+                    asyncio.to_thread(
+                        lambda text: GoogleTranslator(source='auto', target='pt').translate(text),
+                        t[1]
+                    )
+                    for t in tasks_to_run
+                ]
+            else:
+                # Tradução via DeepSeek API
+                coroutines = [
+                    asyncio.to_thread(call_deepseek_api, api_key, api_model, system_prompt, t[1])
+                    for t in tasks_to_run
+                ]
+                
+            # Executar todas as requisições em paralelo concorrente controlado por semáforo
+            tasks = [run_with_sem(c) for c in coroutines]
+            resolved_translations = await asyncio.gather(*tasks)
         
         # Guardar no cache e preencher o array de resultados ordenados
         for idx, (original_idx, chunk, chunk_hash) in enumerate(tasks_to_run):
