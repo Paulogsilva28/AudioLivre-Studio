@@ -9,12 +9,12 @@ def render_translator():
         if "texto_final" in st.session_state and st.session_state.texto_final:
             st.session_state.translator_textarea = st.session_state.texto_final
 
-    st.markdown("### :material/translate: Tradutor de PDF com IA (DeepSeek / Google)")
+    st.markdown("### :material/translate: Tradutor de PDF com IA (Gemini / DeepSeek / Google)")
     
     # Mensagem informativa sobre gratuidade e consumo
     st.markdown("""
     <div style="background: rgba(217, 119, 6, 0.1); border: 1px solid #d97706; padding: 1rem; border-radius: 8px; margin-bottom: 1.5rem; text-align: left; font-size: 0.9rem; color: #f59e0b;">
-        <strong>ECONOMIA E SEGURANÇA:</strong> Escolha o <strong>Google Translate</strong> para traduções 100% gratuitas e sem limite de tokens. Para traduções literárias profundas, selecione o <strong>DeepSeek R1/V3</strong> (a chave global configurada nos segredos do servidor é usada automaticamente se disponível).
+        <strong>ECONOMIA E SEGURANÇA:</strong> Escolha o <strong>Google Translate</strong> para traduções 100% gratuitas e sem limites. Escolha o <strong>Gemini 2.5 Flash</strong> para traduções literárias profundas 100% gratuitas (basta gerar sua chave grátis no Google AI Studio).
     </div>
     """, unsafe_allow_html=True)
 
@@ -29,22 +29,35 @@ def render_translator():
             # Seleção de Modelo
             api_model = st.selectbox(
                 "Modelo de Tradução:",
-                options=["google", "deepseek-chat", "deepseek-reasoner"],
+                options=["google", "gemini-2.5-flash", "deepseek-chat", "deepseek-reasoner"],
                 format_func=lambda x: {
                     "google": "Google Translate (Gratuito - Sem Chave)",
+                    "gemini-2.5-flash": "Gemini 2.5 Flash (Gratuito - Com Chave)",
                     "deepseek-chat": "DeepSeek V3 (Chat - Rápido)",
                     "deepseek-reasoner": "DeepSeek R1 (Reasoner - Raciocínio)"
                 }[x],
-                index=["google", "deepseek-chat", "deepseek-reasoner"].index(st.session_state.deepseek_model) if st.session_state.deepseek_model in ["google", "deepseek-chat", "deepseek-reasoner"] else 0
+                index=["google", "gemini-2.5-flash", "deepseek-chat", "deepseek-reasoner"].index(st.session_state.deepseek_model) if st.session_state.deepseek_model in ["google", "gemini-2.5-flash", "deepseek-chat", "deepseek-reasoner"] else 0
             )
             st.session_state.deepseek_model = api_model
 
             # Configuração e Ocultação Inteligente da Chave de API
             api_key = ""
-            if api_model in ["deepseek-chat", "deepseek-reasoner"]:
+            if api_model == "gemini-2.5-flash":
+                if "GEMINI_API_KEY" in st.secrets and st.secrets["GEMINI_API_KEY"].strip():
+                    api_key = st.secrets["GEMINI_API_KEY"]
+                    st.success("🔒 Chave API do Gemini autenticada pelo servidor!")
+                else:
+                    api_key = st.text_input(
+                        "Gemini API Key:",
+                        type="password",
+                        value=st.session_state.gemini_api_key,
+                        placeholder="Insira sua chave AIzaSy..."
+                    )
+                    st.session_state.gemini_api_key = api_key
+            elif api_model in ["deepseek-chat", "deepseek-reasoner"]:
                 if "DEEPSEEK_API_KEY" in st.secrets and st.secrets["DEEPSEEK_API_KEY"].strip():
                     api_key = st.secrets["DEEPSEEK_API_KEY"]
-                    st.success("🔒 Chave API global autenticada pelo servidor!")
+                    st.success("🔒 Chave API do DeepSeek autenticada pelo servidor!")
                 else:
                     api_key = st.text_input(
                         "DeepSeek API Key:",
@@ -80,7 +93,7 @@ def render_translator():
                 st.session_state.pdf_filename = uploaded_pdf.name
 
         with st.container(border=True):
-            st.markdown("#### 3. Prompts e Instruções (DeepSeek)")
+            st.markdown("#### 3. Prompts e Instruções (IA)")
             contexto = st.text_area(
                 "Sobre o que é o livro (Contexto):",
                 value=st.session_state.contexto_livro,
@@ -111,9 +124,17 @@ def render_translator():
             st.session_state.texto_final = texto_original
 
         # Botão de Ação de Tradução
-        btn_label = "Iniciar Tradução Gratuita" if api_model == "google" else "Iniciar Tradução com DeepSeek"
+        if api_model == "google":
+            btn_label = "Iniciar Tradução Gratuita"
+        elif api_model == "gemini-2.5-flash":
+            btn_label = "Iniciar Tradução com Gemini"
+        else:
+            btn_label = "Iniciar Tradução com DeepSeek"
+
         if st.button(btn_label, icon=":material/translate:", use_container_width=True):
-            if api_model in ["deepseek-chat", "deepseek-reasoner"] and not api_key.strip():
+            if api_model == "gemini-2.5-flash" and not api_key.strip():
+                st.error("Por favor, insira uma Gemini API Key válida nas configurações.")
+            elif api_model in ["deepseek-chat", "deepseek-reasoner"] and not api_key.strip():
                 st.error("Por favor, insira uma DeepSeek API Key válida nas configurações.")
             elif not st.session_state.texto_final.strip():
                 st.warning("Não há texto disponível para tradução. Envie um PDF ou digite algo.")

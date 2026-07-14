@@ -35,6 +35,33 @@ def call_deepseek_api(api_key, api_model, system_prompt, chunk):
     else:
         raise Exception(f"Status {response.status_code} - {response.text}")
 
+def call_gemini_api(api_key, system_prompt, chunk):
+    """Realiza a chamada HTTP síncrona para a API do Gemini 2.5 Flash."""
+    url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key={api_key}"
+    headers = {
+        "Content-Type": "application/json"
+    }
+    payload = {
+        "contents": [{
+            "parts": [{"text": chunk}]
+        }],
+        "systemInstruction": {
+            "parts": [{"text": system_prompt}]
+        },
+        "generationConfig": {
+            "temperature": 0.3
+        }
+    }
+    response = requests.post(url, headers=headers, json=payload, timeout=90)
+    if response.status_code == 200:
+        res_json = response.json()
+        try:
+            return res_json['candidates'][0]['content']['parts'][0]['text'].strip()
+        except (KeyError, IndexError):
+            raise Exception(f"Resposta inválida da API do Gemini: {response.text}")
+    else:
+        raise Exception(f"Status {response.status_code} - {response.text}")
+
 async def traduzir_texto_deepseek(api_key, api_model, translation_style, contexto, instrucoes, texto_completo, progress_bar, status_text):
     """Realiza a tradução de todo o texto de forma concorrente em paralelo com cache MD5 inteligente."""
     chunks = split_text(texto_completo, max_chars=2500)
@@ -49,7 +76,7 @@ async def traduzir_texto_deepseek(api_key, api_model, translation_style, context
     status_text.text("Analisando texto e validando cache...")
     progress_bar.progress(0.05)
     
-    # Prompt do Sistema para o DeepSeek
+    # Prompt do Sistema para o DeepSeek/Gemini
     system_prompt = f"""Você é um tradutor profissional de livros do Inglês para o Português Brasileiro (pt-BR).
 O livro tem o seguinte contexto geral:
 {contexto}
@@ -97,6 +124,12 @@ Mantenha a fidelidade, fluidez de leitura, parágrafos e o tom original correspo
                     lambda text: GoogleTranslator(source='auto', target='pt').translate(text),
                     t[1]
                 )
+                for t in tasks_to_run
+            ]
+        elif api_model == "gemini-2.5-flash":
+            # Tradução via Gemini API
+            coroutines = [
+                asyncio.to_thread(call_gemini_api, api_key, system_prompt, t[1])
                 for t in tasks_to_run
             ]
         else:

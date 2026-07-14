@@ -46,6 +46,8 @@ if 'pdf_filename' not in st.session_state:
     st.session_state.pdf_filename = ""
 if 'translated_text' not in st.session_state:
     st.session_state.translated_text = None
+if 'gemini_api_key' not in st.session_state:
+    st.session_state.gemini_api_key = ""
 
 # --- 2. INJEÇÃO DE ESTILOS CSS ---
 inject_global_css(st.session_state.dark_mode)
