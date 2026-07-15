@@ -93,8 +93,8 @@ def call_gemini_api(api_key, system_prompt, chunk):
 
 async def traduzir_texto_deepseek(api_key, api_model, translation_style, contexto, instrucoes, texto_completo, progress_bar, status_text):
     """Realiza a tradução de todo o texto de forma concorrente em paralelo com cache MD5 inteligente."""
-    # Define o tamanho do bloco dependendo do modelo (Gemini aceita blocos maiores de 12k caracteres)
-    max_chars = 12000 if api_model == "gemini-3.5-flash" else 2500
+    # Define o tamanho do bloco dependendo do modelo (Gemini aceita blocos maiores de 35k caracteres para economizar cota diária de requisições)
+    max_chars = 35000 if api_model == "gemini-3.5-flash" else 2500
     chunks = split_text(texto_completo, max_chars=max_chars)
     total_chunks = len(chunks)
     
