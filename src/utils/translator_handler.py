@@ -8,7 +8,7 @@ from src.utils.tts_handler import split_text
 from deep_translator import GoogleTranslator
 
 def call_deepseek_api(api_key, api_model, system_prompt, chunk):
-    """Realiza a chamada HTTP síncrona para a API da DeepSeek."""
+    """Realiza a chamada HTTP síncrona para a API da DeepSeek com retry inteligente."""
     headers = {
         "Content-Type": "application/json",
         "Authorization": f"Bearer {api_key}"
@@ -23,20 +23,34 @@ def call_deepseek_api(api_key, api_model, system_prompt, chunk):
     if api_model == "deepseek-chat":
         payload["temperature"] = 0.3
         
-    response = requests.post(
-        "https://api.deepseek.com/chat/completions",
-        headers=headers,
-        json=payload,
-        timeout=90
-    )
-    if response.status_code == 200:
-        res_json = response.json()
-        return res_json["choices"][0]["message"]["content"].strip()
-    else:
-        raise Exception(f"Status {response.status_code} - {response.text}")
+    max_retries = 3
+    for attempt in range(max_retries):
+        try:
+            response = requests.post(
+                "https://api.deepseek.com/chat/completions",
+                headers=headers,
+                json=payload,
+                timeout=90
+            )
+            if response.status_code == 200:
+                res_json = response.json()
+                return res_json["choices"][0]["message"]["content"].strip()
+            
+            # Tenta novamente em caso de limite de requisições ou erros temporários de servidor
+            elif response.status_code in [429, 502, 503, 504] and attempt < max_retries - 1:
+                wait_time = (attempt + 1) * 5
+                time.sleep(wait_time)
+                continue
+            else:
+                raise Exception(f"Status {response.status_code} - {response.text}")
+        except requests.exceptions.RequestException as e:
+            if attempt < max_retries - 1:
+                time.sleep((attempt + 1) * 5)
+                continue
+            raise e
 
 def call_gemini_api(api_key, system_prompt, chunk):
-    """Realiza a chamada HTTP síncrona para a API do Gemini 3.5 Flash."""
+    """Realiza a chamada HTTP síncrona para a API do Gemini 3.5 Flash com retry inteligente."""
     url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-3.5-flash:generateContent?key={api_key}"
     headers = {
         "Content-Type": "application/json"
@@ -52,15 +66,30 @@ def call_gemini_api(api_key, system_prompt, chunk):
             "temperature": 0.3
         }
     }
-    response = requests.post(url, headers=headers, json=payload, timeout=180)
-    if response.status_code == 200:
-        res_json = response.json()
+    
+    max_retries = 3
+    for attempt in range(max_retries):
         try:
-            return res_json['candidates'][0]['content']['parts'][0]['text'].strip()
-        except (KeyError, IndexError):
-            raise Exception(f"Resposta inválida da API do Gemini: {response.text}")
-    else:
-        raise Exception(f"Status {response.status_code} - {response.text}")
+            response = requests.post(url, headers=headers, json=payload, timeout=180)
+            if response.status_code == 200:
+                res_json = response.json()
+                try:
+                    return res_json['candidates'][0]['content']['parts'][0]['text'].strip()
+                except (KeyError, IndexError):
+                    raise Exception(f"Resposta inválida da API do Gemini: {response.text}")
+            
+            # Se for erro temporário de servidor (503) ou excesso de taxa (429), tenta novamente com backoff
+            elif response.status_code in [429, 503] and attempt < max_retries - 1:
+                wait_time = (attempt + 1) * 5
+                time.sleep(wait_time)
+                continue
+            else:
+                raise Exception(f"Status {response.status_code} - {response.text}")
+        except requests.exceptions.RequestException as e:
+            if attempt < max_retries - 1:
+                time.sleep((attempt + 1) * 5)
+                continue
+            raise e
 
 async def traduzir_texto_deepseek(api_key, api_model, translation_style, contexto, instrucoes, texto_completo, progress_bar, status_text):
     """Realiza a tradução de todo o texto de forma concorrente em paralelo com cache MD5 inteligente."""
