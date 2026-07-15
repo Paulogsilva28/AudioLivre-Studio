@@ -45,7 +45,7 @@ def call_gemini_api(api_key, system_prompt, chunk):
         "contents": [{
             "parts": [{"text": chunk}]
         }],
-        "systemInstruction": {
+        "system_instruction": {
             "parts": [{"text": system_prompt}]
         },
         "generationConfig": {
