@@ -52,7 +52,7 @@ def call_gemini_api(api_key, system_prompt, chunk):
             "temperature": 0.3
         }
     }
-    response = requests.post(url, headers=headers, json=payload, timeout=90)
+    response = requests.post(url, headers=headers, json=payload, timeout=180)
     if response.status_code == 200:
         res_json = response.json()
         try:
@@ -64,8 +64,8 @@ def call_gemini_api(api_key, system_prompt, chunk):
 
 async def traduzir_texto_deepseek(api_key, api_model, translation_style, contexto, instrucoes, texto_completo, progress_bar, status_text):
     """Realiza a tradução de todo o texto de forma concorrente em paralelo com cache MD5 inteligente."""
-    # Define o tamanho do bloco dependendo do modelo (Gemini aceita blocos maiores de 25k caracteres)
-    max_chars = 25000 if api_model == "gemini-3.5-flash" else 2500
+    # Define o tamanho do bloco dependendo do modelo (Gemini aceita blocos maiores de 12k caracteres)
+    max_chars = 12000 if api_model == "gemini-3.5-flash" else 2500
     chunks = split_text(texto_completo, max_chars=max_chars)
     total_chunks = len(chunks)
     
