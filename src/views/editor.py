@@ -41,10 +41,10 @@ def render_editor():
                 label_visibility="collapsed",
                 placeholder="Cole seu texto aqui ou envie um PDF ao lado para começar..."
             )
+            st.session_state.texto_final = texto_editado
+            st.session_state.roteiro_final_area = texto_editado
             
             if st.button("Salvar Roteiro", icon=":material/save:", use_container_width=True):
-                st.session_state.texto_final = texto_editado
-                st.session_state.roteiro_final_area = texto_editado
                 if texto_editado.strip():
                     st.success("Roteiro salvo com sucesso! Escolha o Tradutor DeepSeek ou o Estúdio de Áudio na barra superior.")
                 else:

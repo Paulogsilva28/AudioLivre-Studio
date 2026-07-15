@@ -155,6 +155,7 @@ def render_translator():
                     progress_bar.progress(1.0, text="Concluído!")
                     status_text.text(f"Tradução finalizada em {total_duration:.1f} segundos!")
                     st.session_state.texto_final = texto_final_traduzido
+                    st.session_state.translator_textarea = texto_final_traduzido
                     st.session_state.roteiro_final_area = texto_final_traduzido
                     st.session_state.translated_text = texto_final_traduzido
                 except Exception as e:
