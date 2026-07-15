@@ -1,5 +1,6 @@
 import streamlit as st
 import io
+import zipfile
 from pypdf import PdfReader
 from src.utils.pdf_handler import dividir_pdf
 
@@ -50,6 +51,33 @@ def render_splitter():
                 if modo_div == "Dividir de 100 em 100 páginas (Recomendado)":
                     st.markdown("##### :material/inventory_2: Lotes de Páginas Gerados")
                     
+                    # Botão para baixar todos os lotes como ZIP de uma vez
+                    try:
+                        with st.spinner("Preparando arquivo ZIP com todos os lotes..."):
+                            zip_buffer = io.BytesIO()
+                            with zipfile.ZipFile(zip_buffer, "w", zipfile.ZIP_DEFLATED) as zip_file:
+                                for start in range(1, total_pages + 1, 100):
+                                    end = min(start + 99, total_pages)
+                                    split_buffer = dividir_pdf(pdf_bytes, start, end)
+                                    zip_file.writestr(
+                                        f"{file_name.rsplit('.', 1)[0]}_paginas_{start}_{end}.pdf",
+                                        split_buffer.getvalue()
+                                    )
+                            zip_buffer.seek(0)
+                        
+                        st.download_button(
+                            label="Baixar Todos os Lotes de uma Vez (ZIP)",
+                            icon=":material/archive:",
+                            data=zip_buffer,
+                            file_name=f"{file_name.rsplit('.', 1)[0]}_todos_os_lotes.zip",
+                            mime="application/zip",
+                            type="primary",
+                            use_container_width=True
+                        )
+                        st.markdown("<br>", unsafe_allow_html=True)
+                    except Exception as e:
+                        st.error(f"Erro ao preparar arquivo ZIP: {e}")
+
                     # Gerar intervalos automáticos de 100 em 100
                     for start in range(1, total_pages + 1, 100):
                         end = min(start + 99, total_pages)
