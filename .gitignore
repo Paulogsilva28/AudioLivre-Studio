@@ -9,8 +9,10 @@ venv/
 ENV/
 env/
 
-# Streamlit secrets (crucial to protect keys!)
+# Streamlit secrets and environment files (crucial to protect keys!)
 .streamlit/secrets.toml
+.env
+*.env
 
 # IDEs and OS files
 .idea/
